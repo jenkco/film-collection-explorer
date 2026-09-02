@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en-GB" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Vault - Personal DVD & Blu-Ray Catalog Explorer</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.4);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
+        .film-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .film-card:hover {
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased">
+
+    <!-- Top Header -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl shadow-md text-white">
+                    <i data-lucide="disc" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-indigo-300">
+                        CineCatalog Matrix
+                    </h1>
+                    <p class="text-xs text-slate-400">Filter, Search & Explore Personal DVD & Blu-Ray Collection</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:flex items-center px-3 py-1.5 bg-slate-800/70 border border-slate-700/60 rounded-lg text-xs text-slate-300">
+                    <span id="stat-showing-count" class="font-bold text-indigo-400 mr-1">0</span> of 
+                    <span id="stat-total-count" class="font-bold text-slate-200 ml-1">0</span> Movies
+                </div>
+
+                <button onclick="openAddMovieModal()" 
+                    class="flex items-center space-x-1.5 text-xs font-semibold px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-md transition">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                    <span>Add Movie</span>
+                </button>
+
+                <button id="btn-reset-filters" onclick="resetFilters()" 
+                    class="flex items-center space-x-1.5 text-xs font-medium px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 transition">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    <span>Reset Filters</span>
+                </button>
+
+                <button onclick="window.print()" 
+                    class="hidden md:flex items-center space-x-1.5 text-xs font-medium px-3 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 rounded-lg border border-indigo-500/30 transition">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                    <span>Export / Print</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Alphabetical Fast Jump Bar -->
+        <section class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 shadow-inner">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="arrow-down-a-z" class="w-3.5 h-3.5 text-indigo-400"></i> Alphabetical Quick Filter
+                </span>
+                <span id="active-letter-indicator" class="text-xs text-indigo-400 font-medium">All Letters</span>
+            </div>
+            <div id="alphabet-bar" class="flex flex-wrap gap-1 justify-center sm:justify-start">
+                <!-- JS will inject A-Z buttons -->
+            </div>
+        </section>
+
+        <!-- Search and Multi-Filter Controls -->
+        <section class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <!-- Search Input -->
+                <div class="md:col-span-4 relative">
+                    <label for="search-input" class="block text-xs font-semibold text-slate-300 mb-1">Search Title, Actor, Genre or Format</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="search-input" placeholder="e.g. Dune, Blu-Ray, Tom Hanks..." 
+                            class="w-full bg-slate-950 border border-slate-700/80 rounded-lg pl-9 pr-8 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                        <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Format Selector (DVD / Blu-Ray) -->
+                <div class="md:col-span-2">
+                    <label for="format-select" class="block text-xs font-semibold text-slate-300 mb-1">Format</label>
+                    <div class="relative">
+                        <select id="format-select" onchange="applyFilters()" 
+                            class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition appearance-none cursor-pointer">
+                            <option value="">All Formats</option>
+                            <option value="Blu-Ray">Blu-Ray</option>
+                            <option value="DVD">DVD</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Genre Selector -->
+                <div class="md:col-span-2">
+                    <label for="genre-select" class="block text-xs font-semibold text-slate-300 mb-1">Genre</label>
+                    <div class="relative">
+                        <select id="genre-select" onchange="applyFilters()" 
+                            class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition appearance-none cursor-pointer">
+                            <option value="">All Genres</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Lead Actor Selector -->
+                <div class="md:col-span-2">
+                    <label for="actor-select" class="block text-xs font-semibold text-slate-300 mb-1">Lead Actor</label>
+                    <div class="relative">
+                        <select id="actor-select" onchange="applyFilters()" 
+                            class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition appearance-none cursor-pointer">
+                            <option value="">All Lead Actors</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Sort Selector -->
+                <div class="md:col-span-2">
+                    <label for="sort-select" class="block text-xs font-semibold text-slate-300 mb-1">Sort By</label>
+                    <div class="relative">
+                        <select id="sort-select" onchange="applyFilters()" 
+                            class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition appearance-none cursor-pointer">
+                            <option value="title-asc">Title (A-Z)</option>
+                            <option value="title-desc">Title (Z-A)</option>
+                            <option value="actor-asc">Lead Actor (A-Z)</option>
+                            <option value="genre-asc">Primary Genre (A-Z)</option>
+                            <option value="year-desc">Release Year (Newest)</option>
+                            <option value="year-asc">Release Year (Oldest)</option>
+                        </select>
+                        <i data-lucide="arrow-up-down" class="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layout View Modes & Tag Bar -->
+            <div class="flex flex-wrap items-center justify-between pt-3 border-t border-slate-800/80 gap-3">
+                <!-- View Mode Toggle -->
+                <div class="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
+                    <button id="view-grid-btn" onclick="setViewMode('grid')" title="Grid View"
+                        class="px-2.5 py-1 rounded text-xs font-medium flex items-center space-x-1 transition bg-indigo-600 text-white">
+                        <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                        <span>Grid</span>
+                    </button>
+                    <button id="view-list-btn" onclick="setViewMode('list')" title="List View"
+                        class="px-2.5 py-1 rounded text-xs font-medium flex items-center space-x-1 transition text-slate-400 hover:text-white">
+                        <i data-lucide="list" class="w-3.5 h-3.5"></i>
+                        <span>Detailed List</span>
+                    </button>
+                    <button id="view-grouped-btn" onclick="setViewMode('grouped')" title="Grouped by Letter"
+                        class="px-2.5 py-1 rounded text-xs font-medium flex items-center space-x-1 transition text-slate-400 hover:text-white">
+                        <i data-lucide="folder-tree" class="w-3.5 h-3.5"></i>
+                        <span>A-Z Grouped</span>
+                    </button>
+                </div>
+
+                <!-- Active Filter Badges Container -->
+                <div id="active-badges" class="flex flex-wrap items-center gap-2">
+                    <!-- Dynamic badges go here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Movie Display Container -->
+        <section id="movie-container" class="space-y-6 min-h-[400px]">
+            <!-- Dynamic content injected here -->
+        </section>
+
+    </main>
+
+    <!-- Detailed Movie Modal -->
+    <div id="movie-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden transform scale-95 transition-transform duration-200" id="modal-card">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div id="modal-content">
+                <!-- Modal details rendered dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Movie Modal -->
+    <div id="add-movie-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden transform scale-95 transition-transform duration-200" id="add-modal-card">
+            <button onclick="closeAddMovieModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <i data-lucide="disc" class="w-5 h-5 text-indigo-400"></i>
+                Add New Movie to Vault
+            </h2>
+
+            <form id="add-movie-form" onsubmit="handleAddMovieSubmit(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Movie Title *</label>
+                    <input type="text" id="add-title" required placeholder="e.g. Inception"
+                        class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Lead Actor *</label>
+                        <input type="text" id="add-actor" required placeholder="e.g. Leonardo DiCaprio"
+                            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Format *</label>
+                        <select id="add-format" required
+                            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                            <option value="Blu-Ray" selected>Blu-Ray</option>
+                            <option value="DVD">DVD</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Primary Genre *</label>
+                        <input type="text" id="add-genre1" required placeholder="e.g. Sci-Fi"
+                            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Secondary Genre (Optional)</label>
+                        <input type="text" id="add-genre2" placeholder="e.g. Action"
+                            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Release Year *</label>
+                        <input type="text" id="add-year" required placeholder="e.g. 2010"
+                            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Accent Theme</label>
+                        <select id="add-accent"
+                            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                            <option value="from-blue-800 to-indigo-950">Blue / Indigo</option>
+                            <option value="from-sky-800 to-slate-950">Sky / Slate</option>
+                            <option value="from-amber-800 to-slate-950">Amber / Slate</option>
+                            <option value="from-emerald-800 to-slate-950">Emerald / Green</option>
+                            <option value="from-red-900 to-slate-950">Red / Crimson</option>
+                            <option value="from-purple-900 to-slate-950">Purple / Violet</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2">
+                    <button type="button" onclick="closeAddMovieModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-lg transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow-md transition">
+                        Save Movie
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Combined DVD and Blu-Ray catalog
+        const movies = [
+            // --- DVDs ---
+            { id: 1, title: "28 Days Later", actor: "Cillian Murphy", genres: ["Horror", "Sci-Fi", "Thriller"], format: "DVD", year: 2002, accent: "from-red-950 to-slate-950" },
+            { id: 2, title: "A Beautiful Mind", actor: "Russell Crowe", genres: ["Biography", "Drama"], format: "DVD", year: 2001, accent: "from-amber-800 to-indigo-950" },
+            { id: 3, title: "A Bridge Too Far", actor: "Dirk Bogarde", genres: ["Drama", "History", "War"], format: "DVD", year: 1977, accent: "from-emerald-900 to-stone-950" },
+            { id: 4, title: "Alien Quadrilogy", actor: "Sigourney Weaver", genres: ["Sci-Fi", "Horror", "Action"], format: "DVD", year: "1979-1997", accent: "from-emerald-950 to-slate-950" },
+            { id: 5, title: "Along Came a Spider", actor: "Morgan Freeman", genres: ["Drama", "Mystery", "Thriller"], format: "DVD", year: 2001, accent: "from-slate-800 to-zinc-950" },
+            { id: 6, title: "Amadeus", actor: "F. Murray Abraham", genres: ["Biography", "Drama", "Music"], format: "DVD", year: 1984, accent: "from-amber-700 to-yellow-950" },
+            { id: 7, title: "American Beauty", actor: "Kevin Spacey", genres: ["Drama"], format: "DVD", year: 1999, accent: "from-rose-900 to-slate-950" },
+            { id: 8, title: "Apollo 13", actor: "Tom Hanks", genres: ["Adventure", "Biography", "Drama"], format: "DVD", year: 1995, accent: "from-sky-800 to-slate-950" },
+            { id: 9, title: "Armageddon", actor: "Bruce Willis", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 1998, accent: "from-orange-900 to-stone-950" },
+            { id: 10, title: "As Good as It Gets", actor: "Jack Nicholson", genres: ["Comedy", "Drama", "Romance"], format: "DVD", year: 1997, accent: "from-rose-800 to-slate-950" },
+            { id: 11, title: "Back to the Future", actor: "Michael J. Fox", genres: ["Adventure", "Comedy", "Sci-Fi"], format: "DVD", year: 1985, accent: "from-cyan-700 to-indigo-950" },
+            { id: 12, title: "Back to the Future Part II", actor: "Michael J. Fox", genres: ["Adventure", "Comedy", "Sci-Fi"], format: "DVD", year: 1989, accent: "from-cyan-800 to-blue-950" },
+            { id: 13, title: "Back to the Future Part III", actor: "Michael J. Fox", genres: ["Adventure", "Comedy", "Sci-Fi", "Western"], format: "DVD", year: 1990, accent: "from-amber-900 to-indigo-950" },
+            { id: 14, title: "Batman The Movie (LEGO)", actor: "Troy Baker", genres: ["Animation", "Action", "Comedy"], format: "DVD", year: 2013, accent: "from-yellow-700 to-slate-950" },
+            { id: 15, title: "Battle of Britain", actor: "Laurence Olivier", genres: ["Action", "Drama", "War"], format: "DVD", year: 1969, accent: "from-sky-900 to-stone-950" },
+            { id: 16, title: "Behind Enemy Lines", actor: "Owen Wilson", genres: ["Action", "Drama", "War"], format: "DVD", year: 2001, accent: "from-slate-800 to-blue-950" },
+            { id: 17, title: "Blade", actor: "Wesley Snipes", genres: ["Action", "Horror", "Sci-Fi"], format: "DVD", year: 1998, accent: "from-red-950 to-zinc-950" },
+            { id: 18, title: "Blade Runner", actor: "Harrison Ford", genres: ["Action", "Drama", "Sci-Fi"], format: "DVD", year: 1982, accent: "from-indigo-950 to-slate-950" },
+            { id: 19, title: "Blood Diamond", actor: "Leonardo DiCaprio", genres: ["Action", "Adventure", "Drama"], format: "DVD", year: 2006, accent: "from-red-900 to-slate-950" },
+            { id: 20, title: "Breakfast at Tiffany's", actor: "Audrey Hepburn", genres: ["Comedy", "Drama", "Romance"], format: "DVD", year: 1961, accent: "from-pink-800 to-teal-950" },
+            { id: 21, title: "Casino", actor: "Robert De Niro", genres: ["Crime", "Drama"], format: "DVD", year: 1995, accent: "from-yellow-800 to-red-950" },
+            { id: 22, title: "Chocolat", actor: "Juliette Binoche", genres: ["Drama", "Romance"], format: "DVD", year: 2000, accent: "from-amber-900 to-stone-950" },
+            { id: 23, title: "Contagion", actor: "Marion Cotillard", genres: ["Drama", "Thriller"], format: "DVD", year: 2011, accent: "from-teal-800 to-slate-950" },
+            { id: 24, title: "DeJaVu", actor: "Denzel Washington", genres: ["Action", "Crime", "Sci-Fi", "Thriller"], format: "DVD", year: 2006, accent: "from-violet-900 to-slate-950" },
+            { id: 25, title: "Deep Impact", actor: "Robert Duvall", genres: ["Action", "Drama", "Sci-Fi"], format: "DVD", year: 1998, accent: "from-slate-800 to-indigo-950" },
+            { id: 26, title: "District 9", actor: "Sharlto Copley", genres: ["Action", "Sci-Fi", "Thriller"], format: "DVD", year: 2009, accent: "from-amber-900 to-stone-950" },
+            { id: 27, title: "Dog Day Afternoon", actor: "Al Pacino", genres: ["Biography", "Crime", "Drama"], format: "DVD", year: 1975, accent: "from-stone-700 to-amber-950" },
+            { id: 28, title: "Donnie Darko", actor: "Jake Gyllenhaal", genres: ["Drama", "Mystery", "Sci-Fi"], format: "DVD", year: 2001, accent: "from-indigo-900 to-slate-950" },
+            { id: 29, title: "Dr. Dolittle", actor: "Eddie Murphy", genres: ["Comedy", "Family", "Fantasy"], format: "DVD", year: 1998, accent: "from-emerald-700 to-slate-950" },
+            { id: 30, title: "Dr. Seuss' Horton Hears a Who!", actor: "Jim Carrey", genres: ["Animation", "Adventure", "Comedy"], format: "DVD", year: 2008, accent: "from-sky-600 to-indigo-950" },
+            { id: 31, title: "Eternal Sunshine of the Spotless Mind", actor: "Jim Carrey", genres: ["Drama", "Romance", "Sci-Fi"], format: "DVD", year: 2004, accent: "from-cyan-800 to-indigo-950" },
+            { id: 32, title: "Evil Dead Trilogy", actor: "Bruce Campbell", genres: ["Comedy", "Horror", "Fantasy"], format: "DVD", year: "1981-1992", accent: "from-red-950 to-slate-950" },
+            { id: 33, title: "Fargo", actor: "Frances McDormand", genres: ["Crime", "Drama", "Thriller"], format: "DVD", year: 1996, accent: "from-sky-900 to-slate-950" },
+            { id: 34, title: "Field of Dreams", actor: "Kevin Costner", genres: ["Drama", "Family", "Fantasy"], format: "DVD", year: 1989, accent: "from-emerald-800 to-slate-950" },
+            { id: 35, title: "Gangs of New York", actor: "Leonardo DiCaprio", genres: ["Crime", "Drama"], format: "DVD", year: 2002, accent: "from-red-900 to-amber-950" },
+            { id: 36, title: "Girl, Interrupted", actor: "Winona Ryder", genres: ["Biography", "Drama"], format: "DVD", year: 1999, accent: "from-slate-700 to-zinc-900" },
+            { id: 37, title: "Gladiator", actor: "Russell Crowe", genres: ["Action", "Adventure", "Drama"], format: "DVD", year: 2000, accent: "from-amber-900 to-stone-950" },
+            { id: 38, title: "Goldmember", actor: "Mike Myers", genres: ["Action", "Comedy", "Crime"], format: "DVD", year: 2002, accent: "from-yellow-600 to-amber-950" },
+            { id: 39, title: "Gran Torino", actor: "Clint Eastwood", genres: ["Drama"], format: "DVD", year: 2008, accent: "from-neutral-800 to-slate-950" },
+            { id: 40, title: "Gravity", actor: "Sandra Bullock", genres: ["Drama", "Sci-Fi", "Thriller"], format: "DVD", year: 2013, accent: "from-slate-800 to-black" },
+            { id: 41, title: "Gremlins", actor: "Zach Galligan", genres: ["Comedy", "Fantasy", "Horror"], format: "DVD", year: 1984, accent: "from-emerald-900 to-rose-950" },
+            { id: 42, title: "Happy Feet", actor: "Elijah Wood", genres: ["Animation", "Adventure", "Comedy"], format: "DVD", year: 2006, accent: "from-sky-700 to-blue-950" },
+            { id: 43, title: "Hidalgo", actor: "Viggo Mortensen", genres: ["Action", "Adventure", "Biography"], format: "DVD", year: 2004, accent: "from-amber-800 to-stone-950" },
+            { id: 44, title: "Home Alone 2: Lost in New York", actor: "Macaulay Culkin", genres: ["Comedy", "Family"], format: "DVD", year: 1992, accent: "from-green-800 to-red-950" },
+            { id: 45, title: "I Am Legend", actor: "Will Smith", genres: ["Action", "Drama", "Sci-Fi"], format: "DVD", year: 2007, accent: "from-amber-900 to-slate-950" },
+            { id: 46, title: "In Her Shoes", actor: "Cameron Diaz", genres: ["Comedy", "Drama", "Romance"], format: "DVD", year: 2005, accent: "from-rose-700 to-purple-950" },
+            { id: 47, title: "In Time", actor: "Justin Timberlake", genres: ["Action", "Sci-Fi", "Thriller"], format: "DVD", year: 2011, accent: "from-emerald-800 to-slate-950" },
+            { id: 48, title: "In the Night Garden... Hello Igglepiggle!", actor: "Derek Jacobi", genres: ["Children", "Family"], format: "DVD", year: 2007, accent: "from-teal-700 to-sky-950" },
+            { id: 49, title: "Indiana Jones and the Kingdom of the Crystal Skull", actor: "Harrison Ford", genres: ["Action", "Adventure"], format: "DVD", year: 2008, accent: "from-amber-800 to-stone-950" },
+            { id: 50, title: "Indiana Jones and the Last Crusade", actor: "Harrison Ford", genres: ["Action", "Adventure"], format: "DVD", year: 1989, accent: "from-amber-900 to-orange-950" },
+            { id: 51, title: "Indiana Jones and the Temple of Doom", actor: "Harrison Ford", genres: ["Action", "Adventure"], format: "DVD", year: 1984, accent: "from-red-900 to-amber-950" },
+            { id: 52, title: "Inferno", actor: "Tom Hanks", genres: ["Action", "Adventure", "Crime", "Mystery"], format: "DVD", year: 2016, accent: "from-red-950 to-stone-950" },
+            { id: 53, title: "Interview with the Vampire", actor: "Tom Cruise", genres: ["Drama", "Fantasy", "Horror"], format: "DVD", year: 1994, accent: "from-purple-950 to-slate-950" },
+            { id: 54, title: "Jarhead", actor: "Jake Gyllenhaal", genres: ["Action", "Biography", "Drama", "War"], format: "DVD", year: 2005, accent: "from-amber-900 to-stone-950" },
+            { id: 55, title: "JFK", actor: "Kevin Costner", genres: ["Drama", "History", "Thriller"], format: "DVD", year: 1991, accent: "from-slate-800 to-stone-950" },
+            { id: 56, title: "Jingle All the Way", actor: "Arnold Schwarzenegger", genres: ["Comedy", "Family"], format: "DVD", year: 1996, accent: "from-red-800 to-emerald-950" },
+            { id: 57, title: "K-PAX", actor: "Kevin Spacey", genres: ["Drama", "Sci-Fi"], format: "DVD", year: 2001, accent: "from-indigo-900 to-slate-950" },
+            { id: 58, title: "Little Miss Sunshine", actor: "Steve Carell", genres: ["Comedy", "Drama"], format: "DVD", year: 2006, accent: "from-yellow-600 to-amber-950" },
+            { id: 59, title: "Man on Fire", actor: "Denzel Washington", genres: ["Action", "Crime", "Drama", "Thriller"], format: "DVD", year: 2004, accent: "from-orange-900 to-slate-950" },
+            { id: 60, title: "Meet Joe Black", actor: "Brad Pitt", genres: ["Drama", "Fantasy", "Romance"], format: "DVD", year: 1998, accent: "from-indigo-900 to-slate-950" },
+            { id: 61, title: "Meet the Parents", actor: "Ben Stiller", genres: ["Comedy", "Romance"], format: "DVD", year: 2000, accent: "from-blue-700 to-slate-950" },
+            { id: 62, title: "Men in Black", actor: "Will Smith", genres: ["Action", "Adventure", "Comedy", "Sci-Fi"], format: "DVD", year: 1997, accent: "from-slate-800 to-indigo-950" },
+            { id: 63, title: "Michael Clayton", actor: "George Clooney", genres: ["Crime", "Drama", "Mystery", "Thriller"], format: "DVD", year: 2007, accent: "from-slate-800 to-zinc-950" },
+            { id: 64, title: "Mission: Impossible The 5 Movie Collection", actor: "Tom Cruise", genres: ["Action", "Adventure", "Thriller"], format: "DVD", year: "1996-2015", accent: "from-red-800 to-slate-950" },
+            { id: 65, title: "Moneyball", actor: "Brad Pitt", genres: ["Biography", "Drama", "Sport"], format: "DVD", year: 2011, accent: "from-emerald-800 to-slate-950" },
+            { id: 66, title: "Monty Python's Life of Brian", actor: "Graham Chapman", genres: ["Comedy"], format: "DVD", year: 1979, accent: "from-amber-700 to-rose-950" },
+            { id: 67, title: "Monty Python's The Meaning of Life", actor: "Graham Chapman", genres: ["Comedy", "Musical"], format: "DVD", year: 1983, accent: "from-purple-800 to-slate-950" },
+            { id: 68, title: "Night at the Museum", actor: "Ben Stiller", genres: ["Adventure", "Comedy", "Family"], format: "DVD", year: 2006, accent: "from-amber-700 to-blue-950" },
+            { id: 69, title: "Night at the Museum: Secret of the Tomb", actor: "Ben Stiller", genres: ["Adventure", "Comedy", "Family"], format: "DVD", year: 2014, accent: "from-indigo-800 to-amber-950" },
+            { id: 70, title: "O Brother, Where Art Thou?", actor: "George Clooney", genres: ["Comedy", "Crime", "Music"], format: "DVD", year: 2000, accent: "from-amber-700 to-stone-950" },
+            { id: 71, title: "Ocean's Eleven", actor: "George Clooney", genres: ["Crime", "Thriller"], format: "DVD", year: 2001, accent: "from-slate-800 to-indigo-950" },
+            { id: 72, title: "Ocean's Thirteen", actor: "George Clooney", genres: ["Crime", "Thriller"], format: "DVD", year: 2007, accent: "from-slate-800 to-purple-950" },
+            { id: 73, title: "Once Upon a Time in the West", actor: "Henry Fonda", genres: ["Western"], format: "DVD", year: 1968, accent: "from-amber-900 to-orange-950" },
+            { id: 74, title: "One Flew Over the Cuckoo's Nest", actor: "Jack Nicholson", genres: ["Drama"], format: "DVD", year: 1975, accent: "from-stone-700 to-slate-950" },
+            { id: 75, title: "Outbreak", actor: "Dustin Hoffman", genres: ["Action", "Drama", "Thriller"], format: "DVD", year: 1995, accent: "from-emerald-900 to-slate-950" },
+            { id: 76, title: "Phenomenon", actor: "John Travolta", genres: ["Drama", "Fantasy", "Romance"], format: "DVD", year: 1996, accent: "from-sky-800 to-indigo-950" },
+            { id: 77, title: "Platoon", actor: "Charlie Sheen", genres: ["Drama", "War"], format: "DVD", year: 1986, accent: "from-emerald-900 to-stone-950" },
+            { id: 78, title: "Predator", actor: "Arnold Schwarzenegger", genres: ["Action", "Adventure", "Horror", "Sci-Fi"], format: "DVD", year: 1987, accent: "from-emerald-800 to-red-950" },
+            { id: 79, title: "Ray", actor: "Jamie Foxx", genres: ["Biography", "Drama", "Music"], format: "DVD", year: 2004, accent: "from-purple-900 to-indigo-950" },
+            { id: 80, title: "Rise of the Planet of the Apes", actor: "James Franco", genres: ["Action", "Drama", "Sci-Fi"], format: "DVD", year: 2011, accent: "from-stone-800 to-emerald-950" },
+            { id: 81, title: "Salt", actor: "Angelina Jolie", genres: ["Action", "Mystery", "Thriller"], format: "DVD", year: 2010, accent: "from-slate-800 to-red-950" },
+            { id: 82, title: "Seabiscuit", actor: "Tobey Maguire", genres: ["Biography", "Drama", "History", "Sport"], format: "DVD", year: 2003, accent: "from-amber-800 to-stone-950" },
+            { id: 83, title: "Serendipity", actor: "John Cusack", genres: ["Comedy", "Romance"], format: "DVD", year: 2001, accent: "from-rose-800 to-indigo-950" },
+            { id: 84, title: "Shallow Hal", actor: "Gwyneth Paltrow", genres: ["Comedy", "Fantasy", "Romance"], format: "DVD", year: 2001, accent: "from-pink-700 to-slate-950" },
+            { id: 85, title: "Sherlock Holmes", actor: "Robert Downey Jr.", genres: ["Action", "Adventure", "Mystery"], format: "DVD", year: 2009, accent: "from-amber-900 to-slate-950" },
+            { id: 86, title: "Shrek", actor: "Mike Myers", genres: ["Animation", "Adventure", "Comedy", "Fantasy"], format: "DVD", year: 2001, accent: "from-lime-800 to-emerald-950" },
+            { id: 87, title: "Shrek 2", actor: "Mike Myers", genres: ["Animation", "Adventure", "Comedy", "Fantasy"], format: "DVD", year: 2004, accent: "from-lime-700 to-teal-950" },
+            { id: 88, title: "Signs", actor: "Mel Gibson", genres: ["Drama", "Mystery", "Sci-Fi"], format: "DVD", year: 2002, accent: "from-emerald-950 to-slate-950" },
+            { id: 89, title: "Snatch", actor: "Jason Statham", genres: ["Comedy", "Crime"], format: "DVD", year: 2000, accent: "from-stone-800 to-indigo-950" },
+            { id: 90, title: "Spanglish", actor: "Adam Sandler", genres: ["Comedy", "Drama", "Romance"], format: "DVD", year: 2004, accent: "from-orange-800 to-slate-950" },
+            { id: 91, title: "Spider-Man", actor: "Tobey Maguire", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 2002, accent: "from-red-800 to-blue-950" },
+            { id: 92, title: "Spy Game", actor: "Robert Redford", genres: ["Action", "Crime", "Thriller"], format: "DVD", year: 2001, accent: "from-amber-900 to-slate-950" },
+            { id: 93, title: "Star Trek First Contact", actor: "Patrick Stewart", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 1996, accent: "from-blue-900 to-slate-950" },
+            { id: 94, title: "Star Trek Generations", actor: "Patrick Stewart", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 1994, accent: "from-blue-800 to-indigo-950" },
+            { id: 95, title: "Star Trek Insurrection", actor: "Patrick Stewart", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 1998, accent: "from-indigo-800 to-teal-950" },
+            { id: 96, title: "Star Trek Into Darkness", actor: "Chris Pine", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 2013, accent: "from-slate-800 to-blue-950" },
+            { id: 97, title: "Star Trek: The Motion Picture", actor: "William Shatner", genres: ["Adventure", "Mystery", "Sci-Fi"], format: "DVD", year: 1979, accent: "from-purple-900 to-slate-950" },
+            { id: 98, title: "Star Wars", actor: "Mark Hamill", genres: ["Action", "Adventure", "Fantasy", "Sci-Fi"], format: "DVD", year: 1977, accent: "from-amber-600 to-blue-950" },
+            { id: 99, title: "Stargate", actor: "Kurt Russell", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 1994, accent: "from-cyan-900 to-amber-950" },
+            { id: 100, title: "Stigmata", actor: "Patricia Arquette", genres: ["Horror", "Mystery"], format: "DVD", year: 1999, accent: "from-red-950 to-stone-950" },
+            { id: 101, title: "Superbad", actor: "Jonah Hill", genres: ["Comedy"], format: "DVD", year: 2007, accent: "from-yellow-700 to-red-950" },
+            { id: 102, title: "Taken 2", actor: "Liam Neeson", genres: ["Action", "Crime", "Thriller"], format: "DVD", year: 2012, accent: "from-slate-800 to-stone-950" },
+            { id: 103, title: "The Abyss", actor: "Ed Harris", genres: ["Adventure", "Drama", "Sci-Fi"], format: "DVD", year: 1989, accent: "from-cyan-900 to-slate-950" },
+            { id: 104, title: "The American", actor: "George Clooney", genres: ["Action", "Crime", "Drama"], format: "DVD", year: 2010, accent: "from-stone-800 to-slate-950" },
+            { id: 105, title: "The Aviator", actor: "Leonardo DiCaprio", genres: ["Biography", "Drama"], format: "DVD", year: 2004, accent: "from-amber-800 to-slate-950" },
+            { id: 106, title: "The Body", actor: "Antonio Banderas", genres: ["Drama", "Mystery", "Thriller"], format: "DVD", year: 2001, accent: "from-stone-800 to-amber-950" },
+            { id: 107, title: "The Bourne Ultimate Collection", actor: "Matt Damon", genres: ["Action", "Mystery", "Thriller"], format: "DVD", year: "2002-2012", accent: "from-slate-800 to-blue-950" },
+            { id: 108, title: "The Butterfly Effect", actor: "Ashton Kutcher", genres: ["Drama", "Sci-Fi", "Thriller"], format: "DVD", year: 2004, accent: "from-purple-900 to-slate-950" },
+            { id: 109, title: "The Count of Monte Cristo", actor: "Jim Caviezel", genres: ["Action", "Adventure", "Drama"], format: "DVD", year: 2002, accent: "from-amber-900 to-stone-950" },
+            { id: 110, title: "The Da Vinci Code", actor: "Tom Hanks", genres: ["Mystery", "Thriller"], format: "DVD", year: 2006, accent: "from-amber-950 to-stone-950" },
+            { id: 111, title: "The Day After Tomorrow", actor: "Dennis Quaid", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 2004, accent: "from-sky-900 to-slate-950" },
+            { id: 112, title: "The Devil Wears Prada", actor: "Meryl Streep", genres: ["Comedy", "Drama"], format: "DVD", year: 2006, accent: "from-rose-800 to-purple-950" },
+            { id: 113, title: "The Exorcism of Emily Rose", actor: "Laura Linney", genres: ["Drama", "Horror", "Mystery"], format: "DVD", year: 2005, accent: "from-stone-900 to-red-950" },
+            { id: 114, title: "The Exorcist", actor: "Ellen Burstyn", genres: ["Horror"], format: "DVD", year: 1973, accent: "from-slate-900 to-red-950" },
+            { id: 115, title: "The Girl with the Dragon Tattoo", actor: "Daniel Craig", genres: ["Crime", "Drama", "Mystery"], format: "DVD", year: 2011, accent: "from-zinc-800 to-slate-950" },
+            { id: 116, title: "The Godfather", actor: "Marlon Brando", genres: ["Crime", "Drama"], format: "DVD", year: 1972, accent: "from-stone-900 to-amber-950" },
+            { id: 117, title: "The Goonies", actor: "Sean Astin", genres: ["Adventure", "Comedy", "Family"], format: "DVD", year: 1985, accent: "from-amber-700 to-indigo-950" },
+            { id: 118, title: "The Great Escape", actor: "Steve McQueen", genres: ["Adventure", "Drama", "History", "War"], format: "DVD", year: 1963, accent: "from-amber-800 to-stone-950" },
+            { id: 119, title: "The Green Mile", actor: "Tom Hanks", genres: ["Crime", "Drama", "Fantasy"], format: "DVD", year: 1999, accent: "from-emerald-900 to-slate-950" },
+            { id: 120, title: "The Italian Job", actor: "Mark Wahlberg", genres: ["Action", "Crime", "Thriller"], format: "DVD", year: 2003, accent: "from-blue-800 to-slate-950" },
+            { id: 121, title: "The King's Speech", actor: "Colin Firth", genres: ["Biography", "Drama", "History"], format: "DVD", year: 2010, accent: "from-amber-800 to-slate-950" },
+            { id: 122, title: "The Legend of Bagger Vance", actor: "Will Smith", genres: ["Drama", "Fantasy", "Sport"], format: "DVD", year: 2000, accent: "from-emerald-800 to-amber-950" },
+            { id: 123, title: "The Lord of the Rings: The Two Towers", actor: "Elijah Wood", genres: ["Action", "Adventure", "Drama", "Fantasy"], format: "DVD", year: 2002, accent: "from-amber-800 to-emerald-950" },
+            { id: 124, title: "The Mask of Zorro", actor: "Antonio Banderas", genres: ["Action", "Adventure", "Comedy"], format: "DVD", year: 1998, accent: "from-red-900 to-amber-950" },
+            { id: 125, title: "The Mummy", actor: "Brendan Fraser", genres: ["Action", "Adventure", "Fantasy"], format: "DVD", year: 1999, accent: "from-amber-800 to-stone-950" },
+            { id: 126, title: "The Mummy Returns", actor: "Brendan Fraser", genres: ["Action", "Adventure", "Fantasy"], format: "DVD", year: 2001, accent: "from-amber-900 to-orange-950" },
+            { id: 127, title: "The Mummy: Tomb of the Dragon Emperor", actor: "Brendan Fraser", genres: ["Action", "Adventure", "Fantasy"], format: "DVD", year: 2008, accent: "from-red-900 to-stone-950" },
+            { id: 128, title: "The Naked Gun", actor: "Leslie Nielsen", genres: ["Comedy", "Crime"], format: "DVD", year: 1988, accent: "from-blue-700 to-red-950" },
+            { id: 129, title: "The Nutty Professor", actor: "Eddie Murphy", genres: ["Comedy", "Romance", "Sci-Fi"], format: "DVD", year: 1996, accent: "from-indigo-700 to-pink-950" },
+            { id: 130, title: "The Polar Express", actor: "Tom Hanks", genres: ["Animation", "Adventure", "Comedy", "Family"], format: "DVD", year: 2004, accent: "from-blue-800 to-cyan-950" },
+            { id: 131, title: "The Sandlot Kids", actor: "Tom Guiry", genres: ["Comedy", "Family", "Sport"], format: "DVD", year: 1993, accent: "from-amber-700 to-emerald-950" },
+            { id: 132, title: "The Sandlot Kids 2", actor: "Max Lloyd-Jones", genres: ["Comedy", "Family", "Sport"], format: "DVD", year: 2005, accent: "from-emerald-700 to-amber-950" },
+            { id: 133, title: "The Seven Year Itch", actor: "Marilyn Monroe", genres: ["Comedy", "Romance"], format: "DVD", year: 1955, accent: "from-pink-800 to-rose-950" },
+            { id: 134, title: "The Sixth Sense", actor: "Bruce Willis", genres: ["Drama", "Mystery", "Sci-Fi", "Thriller"], format: "DVD", year: 1999, accent: "from-slate-800 to-purple-950" },
+            { id: 135, title: "The Sum of All Fears", actor: "Ben Affleck", genres: ["Action", "Drama", "Thriller"], format: "DVD", year: 2002, accent: "from-slate-800 to-red-950" },
+            { id: 136, title: "The Tailor of Panama", actor: "Pierce Brosnan", genres: ["Drama", "Thriller"], format: "DVD", year: 2001, accent: "from-teal-800 to-slate-950" },
+            { id: 137, title: "The Thomas Crown Affair", actor: "Pierce Brosnan", genres: ["Crime", "Romance", "Thriller"], format: "DVD", year: 1999, accent: "from-blue-900 to-slate-950" },
+            { id: 138, title: "The Tourist", actor: "Johnny Depp", genres: ["Action", "Romance", "Thriller"], format: "DVD", year: 2010, accent: "from-indigo-900 to-slate-950" },
+            { id: 139, title: "Three Kings", actor: "George Clooney", genres: ["Action", "Adventure", "Comedy", "War"], format: "DVD", year: 1999, accent: "from-amber-800 to-stone-950" },
+            { id: 140, title: "Total Recall", actor: "Arnold Schwarzenegger", genres: ["Action", "Sci-Fi"], format: "DVD", year: 1990, accent: "from-red-900 to-amber-950" },
+            { id: 141, title: "Transformers", actor: "Shia LaBeouf", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 2007, accent: "from-blue-900 to-slate-950" },
+            { id: 142, title: "Transformers: Revenge of the Fallen", actor: "Shia LaBeouf", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 2009, accent: "from-orange-900 to-slate-950" },
+            { id: 143, title: "Tropic Thunder", actor: "Ben Stiller", genres: ["Action", "Comedy"], format: "DVD", year: 2008, accent: "from-emerald-800 to-amber-950" },
+            { id: 144, title: "Twelve Monkeys", actor: "Bruce Willis", genres: ["Mystery", "Sci-Fi", "Thriller"], format: "DVD", year: 1995, accent: "from-slate-800 to-stone-950" },
+            { id: 145, title: "Twister", actor: "Helen Hunt", genres: ["Action", "Adventure", "Drama", "Thriller"], format: "DVD", year: 1996, accent: "from-slate-700 to-emerald-950" },
+            { id: 146, title: "Unbreakable", actor: "Bruce Willis", genres: ["Drama", "Mystery", "Sci-Fi", "Thriller"], format: "DVD", year: 2000, accent: "from-emerald-900 to-slate-950" },
+            { id: 147, title: "Valkyrie", actor: "Tom Cruise", genres: ["Drama", "History", "Thriller", "War"], format: "DVD", year: 2008, accent: "from-slate-800 to-red-950" },
+            { id: 148, title: "Vanilla Sky", actor: "Tom Cruise", genres: ["Fantasy", "Mystery", "Romance", "Sci-Fi"], format: "DVD", year: 2001, accent: "from-sky-800 to-indigo-950" },
+            { id: 149, title: "Volcano", actor: "Tommy Lee Jones", genres: ["Action", "Drama", "Sci-Fi", "Thriller"], format: "DVD", year: 1997, accent: "from-red-900 to-stone-950" },
+            { id: 150, title: "Walk the Line", actor: "Joaquin Phoenix", genres: ["Biography", "Drama", "Music", "Romance"], format: "DVD", year: 2005, accent: "from-amber-900 to-red-950" },
+            { id: 151, title: "We Bought a Zoo", actor: "Matt Damon", genres: ["Comedy", "Drama", "Family"], format: "DVD", year: 2011, accent: "from-emerald-700 to-amber-950" },
+            { id: 152, title: "Wonder Woman", actor: "Gal Gadot", genres: ["Action", "Adventure", "Fantasy"], format: "DVD", year: 2017, accent: "from-amber-700 to-red-950" },
+            { id: 153, title: "X-Men 2", actor: "Patrick Stewart", genres: ["Action", "Sci-Fi"], format: "DVD", year: 2003, accent: "from-blue-900 to-slate-950" },
+
+            // --- Blu-Rays ---
+            { id: 154, title: "2012", actor: "John Cusack", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2009, accent: "from-blue-900 to-slate-950" },
+            { id: 155, title: "8 Mile", actor: "Eminem", genres: ["Drama", "Music"], format: "Blu-Ray", year: 2002, accent: "from-slate-800 to-zinc-950" },
+            { id: 156, title: "A Few Dollars More", actor: "Clint Eastwood", genres: ["Western"], format: "Blu-Ray", year: 1965, accent: "from-amber-900 to-stone-950" },
+            { id: 157, title: "Aftersun", actor: "Paul Mescal", genres: ["Drama"], format: "Blu-Ray", year: 2022, accent: "from-sky-800 to-amber-950" },
+            { id: 158, title: "Apocalypse Now Final Cut", actor: "Martin Sheen", genres: ["Drama", "Mystery", "War"], format: "Blu-Ray", year: 1979, accent: "from-orange-900 to-stone-950" },
+            { id: 159, title: "Avatar", actor: "Sam Worthington", genres: ["Action", "Adventure", "Fantasy", "Sci-Fi"], format: "Blu-Ray", year: 2009, accent: "from-cyan-800 to-blue-950" },
+            { id: 160, title: "Batman", actor: "Michael Keaton", genres: ["Action", "Adventure"], format: "Blu-Ray", year: 1989, accent: "from-slate-900 to-purple-950" },
+            { id: 161, title: "Batman Begins", actor: "Christian Bale", genres: ["Action", "Crime", "Drama"], format: "Blu-Ray", year: 2005, accent: "from-stone-900 to-amber-950" },
+            { id: 162, title: "Ben-Hur", actor: "Charlton Heston", genres: ["Adventure", "Drama", "History"], format: "Blu-Ray", year: 1959, accent: "from-amber-800 to-stone-950" },
+            { id: 163, title: "Blade Runner The Final Cut", actor: "Harrison Ford", genres: ["Action", "Drama", "Sci-Fi"], format: "Blu-Ray", year: 1982, accent: "from-indigo-900 to-slate-950" },
+            { id: 164, title: "Blade Runner 2049", actor: "Ryan Gosling", genres: ["Action", "Drama", "Mystery", "Sci-Fi"], format: "Blu-Ray", year: 2017, accent: "from-orange-800 to-cyan-950" },
+            { id: 165, title: "Boogie Nights", actor: "Mark Wahlberg", genres: ["Drama"], format: "Blu-Ray", year: 1997, accent: "from-purple-800 to-amber-950" },
+            { id: 166, title: "Casino Royale", actor: "Daniel Craig", genres: ["Action", "Adventure", "Thriller"], format: "Blu-Ray", year: 2006, accent: "from-slate-800 to-cyan-950" },
+            { id: 167, title: "Chitty Chitty Bang Bang", actor: "Dick Van Dyke", genres: ["Adventure", "Family", "Fantasy", "Musical"], format: "Blu-Ray", year: 1968, accent: "from-sky-700 to-pink-950" },
+            { id: 168, title: "Dazed and Confused", actor: "Jason London", genres: ["Comedy"], format: "Blu-Ray", year: 1993, accent: "from-amber-700 to-emerald-950" },
+            { id: 169, title: "Deadpool 2", actor: "Ryan Reynolds", genres: ["Action", "Adventure", "Comedy", "Sci-Fi"], format: "Blu-Ray", year: 2018, accent: "from-red-800 to-slate-950" },
+            { id: 170, title: "Death Proof", actor: "Kurt Russell", genres: ["Action", "Thriller"], format: "Blu-Ray", year: 2007, accent: "from-stone-900 to-red-950" },
+            { id: 171, title: "Django Unchained", actor: "Jamie Foxx", genres: ["Drama", "Western"], format: "Blu-Ray", year: 2012, accent: "from-red-900 to-amber-950" },
+            { id: 172, title: "Dr. Strangelove", actor: "Peter Sellers", genres: ["Comedy", "War"], format: "Blu-Ray", year: 1964, accent: "from-stone-800 to-slate-950" },
+            { id: 173, title: "Dune", actor: "Timothée Chalamet", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2021, accent: "from-amber-900 to-slate-950" },
+            { id: 174, title: "Dune: Part Two", actor: "Timothée Chalamet", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2024, accent: "from-orange-900 to-amber-950" },
+            { id: 175, title: "Ferris Bueller's Day Off", actor: "Matthew Broderick", genres: ["Comedy"], format: "Blu-Ray", year: 1986, accent: "from-sky-700 to-red-950" },
+            { id: 176, title: "Fight Club", actor: "Brad Pitt", genres: ["Drama"], format: "Blu-Ray", year: 1999, accent: "from-rose-900 to-slate-950" },
+            { id: 177, title: "Forrest Gump", actor: "Tom Hanks", genres: ["Drama", "Romance"], format: "Blu-Ray", year: 1994, accent: "from-blue-800 to-amber-950" },
+            { id: 178, title: "Full Metal Jacket", actor: "Matthew Modine", genres: ["Drama", "War"], format: "Blu-Ray", year: 1987, accent: "from-emerald-900 to-stone-950" },
+            { id: 179, title: "Fury", actor: "Brad Pitt", genres: ["Action", "Drama", "War"], format: "Blu-Ray", year: 2014, accent: "from-stone-800 to-amber-950" },
+            { id: 180, title: "Gladiator", actor: "Russell Crowe", genres: ["Action", "Adventure", "Drama"], format: "Blu-Ray", year: 2000, accent: "from-amber-900 to-stone-950" },
+            { id: 181, title: "Guardians of the Galaxy", actor: "Chris Pratt", genres: ["Action", "Adventure", "Comedy", "Sci-Fi"], format: "Blu-Ray", year: 2014, accent: "from-purple-900 to-cyan-950" },
+            { id: 182, title: "Hacksaw Ridge", actor: "Andrew Garfield", genres: ["Biography", "Drama", "History", "War"], format: "Blu-Ray", year: 2016, accent: "from-red-950 to-stone-950" },
+            { id: 183, title: "High and Low", actor: "Toshiro Mifune", genres: ["Crime", "Drama", "Mystery", "Thriller"], format: "Blu-Ray", year: 1963, accent: "from-zinc-800 to-slate-950" },
+            { id: 184, title: "Ikiru", actor: "Takashi Shimura", genres: ["Drama"], format: "Blu-Ray", year: 1952, accent: "from-slate-800 to-stone-950" },
+            { id: 185, title: "Inception", actor: "Leonardo DiCaprio", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2010, accent: "from-slate-800 to-indigo-950" },
+            { id: 186, title: "Inglourious Basterds", actor: "Brad Pitt", genres: ["Adventure", "Drama", "War"], format: "Blu-Ray", year: 2009, accent: "from-red-900 to-stone-950" },
+            { id: 187, title: "Interstellar", actor: "Matthew McConaughey", genres: ["Adventure", "Drama", "Sci-Fi"], format: "Blu-Ray", year: 2014, accent: "from-indigo-900 to-slate-950" },
+            { id: 188, title: "Iron Man", actor: "Robert Downey Jr.", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2008, accent: "from-red-800 to-amber-950" },
+            { id: 189, title: "Jackie Brown", actor: "Pam Grier", genres: ["Crime", "Drama", "Thriller"], format: "Blu-Ray", year: 1997, accent: "from-amber-800 to-red-950" },
+            { id: 190, title: "Jaws", actor: "Roy Scheider", genres: ["Adventure", "Thriller"], format: "Blu-Ray", year: 1975, accent: "from-blue-900 to-cyan-950" },
+            { id: 191, title: "Jurassic Park", actor: "Sam Neill", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 1993, accent: "from-emerald-900 to-amber-950" },
+            { id: 192, title: "Jurassic Park III", actor: "Sam Neill", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2001, accent: "from-emerald-800 to-slate-950" },
+            { id: 193, title: "Kill Bill Volume 1", actor: "Uma Thurman", genres: ["Action", "Crime", "Thriller"], format: "Blu-Ray", year: 2003, accent: "from-yellow-600 to-red-950" },
+            { id: 194, title: "Kill Bill Volume 2", actor: "Uma Thurman", genres: ["Action", "Crime", "Thriller"], format: "Blu-Ray", year: 2004, accent: "from-amber-700 to-red-950" },
+            { id: 195, title: "La Haine", actor: "Vincent Cassel", genres: ["Crime", "Drama"], format: "Blu-Ray", year: 1995, accent: "from-zinc-800 to-stone-950" },
+            { id: 196, title: "La La Land", actor: "Ryan Gosling", genres: ["Comedy", "Drama", "Music", "Romance"], format: "Blu-Ray", year: 2016, accent: "from-purple-800 to-indigo-950" },
+            { id: 197, title: "Lost in Translation", actor: "Bill Murray", genres: ["Comedy", "Drama"], format: "Blu-Ray", year: 2003, accent: "from-indigo-800 to-rose-950" },
+            { id: 198, title: "Mulholland Dr.", actor: "Naomi Watts", genres: ["Drama", "Mystery", "Thriller"], format: "Blu-Ray", year: 2001, accent: "from-purple-950 to-slate-950" },
+            { id: 199, title: "No Country for Old Men", actor: "Tommy Lee Jones", genres: ["Crime", "Drama", "Thriller"], format: "Blu-Ray", year: 2007, accent: "from-stone-900 to-amber-950" },
+            { id: 200, title: "Oliver!", actor: "Mark Lester", genres: ["Drama", "Family", "Musical"], format: "Blu-Ray", year: 1968, accent: "from-amber-800 to-slate-950" },
+            { id: 201, title: "Once Upon a Time in... Hollywood", actor: "Leonardo DiCaprio", genres: ["Comedy", "Drama"], format: "Blu-Ray", year: 2019, accent: "from-yellow-700 to-orange-950" },
+            { id: 202, title: "Oppenheimer", actor: "Cillian Murphy", genres: ["Biography", "Drama", "History"], format: "Blu-Ray", year: 2023, accent: "from-orange-900 to-stone-950" },
+            { id: 203, title: "Pulp Fiction", actor: "John Travolta", genres: ["Crime", "Drama"], format: "Blu-Ray", year: 1994, accent: "from-yellow-700 to-red-950" },
+            { id: 204, title: "Raiders of the Lost Ark", actor: "Harrison Ford", genres: ["Action", "Adventure"], format: "Blu-Ray", year: 1981, accent: "from-amber-800 to-orange-950" },
+            { id: 205, title: "Ran", actor: "Tatsuya Nakadai", genres: ["Action", "Drama", "War"], format: "Blu-Ray", year: 1985, accent: "from-red-950 to-stone-950" },
+            { id: 206, title: "Red Lights", actor: "Cillian Murphy", genres: ["Drama", "Fantasy", "Mystery", "Thriller"], format: "Blu-Ray", year: 2012, accent: "from-red-950 to-slate-950" },
+            { id: 207, title: "Rise of the Planet of the Apes", actor: "James Franco", genres: ["Action", "Drama", "Sci-Fi"], format: "Blu-Ray", year: 2011, accent: "from-stone-800 to-emerald-950" },
+            { id: 208, title: "Se7en", actor: "Morgan Freeman", genres: ["Crime", "Drama", "Mystery", "Thriller"], format: "Blu-Ray", year: 1995, accent: "from-slate-900 to-zinc-950" },
+            { id: 209, title: "Skyfall", actor: "Daniel Craig", genres: ["Action", "Adventure", "Thriller"], format: "Blu-Ray", year: 2012, accent: "from-slate-800 to-cyan-950" },
+            { id: 210, title: "Slumdog Millionaire", actor: "Dev Patel", genres: ["Drama", "Romance"], format: "Blu-Ray", year: 2008, accent: "from-amber-700 to-purple-950" },
+            { id: 211, title: "Some Like It Hot", actor: "Marilyn Monroe", genres: ["Comedy", "Music", "Romance"], format: "Blu-Ray", year: 1959, accent: "from-pink-800 to-slate-950" },
+            { id: 212, title: "Spider-Man: No Way Home", actor: "Tom Holland", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2021, accent: "from-red-800 to-blue-950" },
+            { id: 213, title: "Stanley Kubrick Visionary Filmmaker Collection", actor: "Various / Anthology", genres: ["Drama", "Sci-Fi", "War"], format: "Blu-Ray", year: "1960-1999", accent: "from-purple-900 to-stone-950" },
+            { id: 214, title: "Taken", actor: "Liam Neeson", genres: ["Action", "Crime", "Thriller"], format: "Blu-Ray", year: 2008, accent: "from-slate-800 to-stone-950" },
+            { id: 215, title: "Taxi Driver", actor: "Robert De Niro", genres: ["Crime", "Drama"], format: "Blu-Ray", year: 1976, accent: "from-yellow-800 to-stone-950" },
+            { id: 216, title: "The Adjustment Bureau", actor: "Matt Damon", genres: ["Action", "Romance", "Sci-Fi", "Thriller"], format: "Blu-Ray", year: 2011, accent: "from-slate-800 to-indigo-950" },
+            { id: 217, title: "The Avengers: Endgame", actor: "Robert Downey Jr.", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2019, accent: "from-purple-900 to-blue-950" },
+            { id: 218, title: "The Dark Knight", actor: "Christian Bale", genres: ["Action", "Crime", "Drama"], format: "Blu-Ray", year: 2008, accent: "from-slate-900 to-blue-950" },
+            { id: 219, title: "The Deer Hunter", actor: "Robert De Niro", genres: ["Drama", "War"], format: "Blu-Ray", year: 1978, accent: "from-stone-800 to-slate-950" },
+            { id: 220, title: "The Good, the Bad and the Ugly", actor: "Clint Eastwood", genres: ["Western"], format: "Blu-Ray", year: 1966, accent: "from-amber-900 to-orange-950" },
+            { id: 221, title: "The Guard", actor: "Brendan Gleeson", genres: ["Comedy", "Crime"], format: "Blu-Ray", year: 2011, accent: "from-emerald-800 to-stone-950" },
+            { id: 222, title: "The Hateful Eight", actor: "Samuel L. Jackson", genres: ["Crime", "Drama", "Mystery", "Western"], format: "Blu-Ray", year: 2015, accent: "from-red-950 to-stone-950" },
+            { id: 223, title: "The Lost World: Jurassic Park", actor: "Jeff Goldblum", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 1997, accent: "from-emerald-950 to-stone-950" },
+            { id: 224, title: "The Martian", actor: "Matt Damon", genres: ["Adventure", "Drama", "Sci-Fi"], format: "Blu-Ray", year: 2015, accent: "from-orange-900 to-slate-950" },
+            { id: 225, title: "The Recruit", actor: "Al Pacino", genres: ["Action", "Crime", "Drama", "Thriller"], format: "Blu-Ray", year: 2003, accent: "from-slate-800 to-indigo-950" },
+            { id: 226, title: "The Thing 2 Movie Boxset", actor: "Kurt Russell", genres: ["Horror", "Mystery", "Sci-Fi"], format: "Blu-Ray", year: "1982-2011", accent: "from-sky-900 to-slate-950" },
+            { id: 227, title: "The Wolf of Wall Street", actor: "Leonardo DiCaprio", genres: ["Biography", "Comedy", "Crime"], format: "Blu-Ray", year: 2013, accent: "from-amber-700 to-emerald-950" },
+            { id: 228, title: "Titanic", actor: "Leonardo DiCaprio", genres: ["Drama", "Romance"], format: "Blu-Ray", year: 1997, accent: "from-blue-900 to-slate-950" },
+            { id: 229, title: "Top Gun 2-Movie Collection", actor: "Tom Cruise", genres: ["Action", "Drama"], format: "Blu-Ray", year: "1986-2022", accent: "from-sky-800 to-blue-950" },
+            { id: 230, title: "Trainspotting", actor: "Ewan McGregor", genres: ["Drama"], format: "Blu-Ray", year: 1996, accent: "from-orange-800 to-slate-950" },
+            { id: 231, title: "Twin Peaks: Fire Walk with Me", actor: "Sheryl Lee", genres: ["Drama", "Horror", "Mystery"], format: "Blu-Ray", year: 1992, accent: "from-red-950 to-purple-950" },
+            { id: 232, title: "Twin Peaks: The Television Collection", actor: "Kyle MacLachlan", genres: ["Drama", "Mystery", "Crime"], format: "Blu-Ray", year: "1990-2017", accent: "from-purple-900 to-slate-950" },
+            { id: 233, title: "Wolf Warriors / A Fistful of Dollars", actor: "Clint Eastwood / Wu Jing", genres: ["Action", "Western"], format: "Blu-Ray", year: "1964-2015", accent: "from-amber-900 to-red-950" },
+            { id: 234, title: "X-Men Origins: Wolverine", actor: "Hugh Jackman", genres: ["Action", "Sci-Fi"], format: "Blu-Ray", year: 2009, accent: "from-amber-800 to-slate-950" }
+        ];
+
+        let currentLetterFilter = null;
+        let currentViewMode = 'grid'; // 'grid', 'list', 'grouped'
+
+        // Utility: Strip leading "The " or "A " for proper alphabetical sorting
+        function getSortTitle(title) {
+            return title.replace(/^(The|A|An)\s+/i, '');
+        }
+
+        // Initialize UI component options
+        function initControls() {
+            // Extract unique genres
+            const genreSet = new Set();
+            movies.forEach(m => m.genres.forEach(g => genreSet.add(g)));
+            const genres = Array.from(genreSet).sort();
+
+            const genreSelect = document.getElementById('genre-select');
+            const selectedGenre = genreSelect.value;
+            genreSelect.innerHTML = '<option value="">All Genres</option>';
+            genres.forEach(g => {
+                const count = movies.filter(m => m.genres.includes(g)).length;
+                const opt = document.createElement('option');
+                opt.value = g;
+                opt.textContent = `${g} (${count})`;
+                genreSelect.appendChild(opt);
+            });
+            genreSelect.value = selectedGenre;
+
+            // Extract unique actors
+            const actorSet = new Set();
+            movies.forEach(m => actorSet.add(m.actor));
+            const actors = Array.from(actorSet).sort();
+
+            const actorSelect = document.getElementById('actor-select');
+            const selectedActor = actorSelect.value;
+            actorSelect.innerHTML = '<option value="">All Lead Actors</option>';
+            actors.forEach(a => {
+                const count = movies.filter(m => m.actor === a).length;
+                const opt = document.createElement('option');
+                opt.value = a;
+                opt.textContent = `${a} (${count})`;
+                actorSelect.appendChild(opt);
+            });
+            actorSelect.value = selectedActor;
+
+            const alphabetBar = document.getElementById('alphabet-bar');
+            alphabetBar.innerHTML = '';
+
+            // Add "ALL" button
+            const allBtn = document.createElement('button');
+            allBtn.className = `px-2 py-1 text-xs font-bold rounded transition ${currentLetterFilter === null ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`;
+            allBtn.textContent = 'ALL';
+            allBtn.onclick = () => selectLetter(null);
+            alphabetBar.appendChild(allBtn);
+
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+            letters.forEach(letter => {
+                const hasMovies = movies.some(m => getSortTitle(m.title).toUpperCase().startsWith(letter));
+                const btn = document.createElement('button');
+                
+                let btnStyle = "px-2 py-1 text-xs font-semibold rounded transition ";
+                if (currentLetterFilter === letter) {
+                    btnStyle += "bg-indigo-600 text-white shadow-md";
+                } else if (hasMovies) {
+                    btnStyle += "bg-slate-800 text-slate-200 hover:bg-indigo-900/50 hover:text-indigo-300 border border-slate-700/60";
+                } else {
+                    btnStyle += "bg-slate-900/40 text-slate-600 cursor-not-allowed border border-slate-800/40";
+                    btn.disabled = true;
+                }
+                
+                btn.className = btnStyle;
+                btn.textContent = letter;
+                btn.onclick = () => selectLetter(letter);
+                alphabetBar.appendChild(btn);
+            });
+
+            // Search listener
+            const searchInput = document.getElementById('search-input');
+            searchInput.removeEventListener('input', handleSearchInput);
+            searchInput.addEventListener('input', handleSearchInput);
+        }
+
+        function handleSearchInput(e) {
+            document.getElementById('clear-search').classList.toggle('hidden', !e.target.value);
+            applyFilters();
+        }
+
+        function getFilteredMovies() {
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            const genreFilter = document.getElementById('genre-select').value;
+            const actorFilter = document.getElementById('actor-select').value;
+            const formatFilter = document.getElementById('format-select').value;
+            const sortBy = document.getElementById('sort-select').value;
+
+            return movies.filter(m => {
+                // Search match across Title, Lead Actor, Genres, and Format
+                const matchSearch = !searchQuery || 
+                    m.title.toLowerCase().includes(searchQuery) ||
+                    m.actor.toLowerCase().includes(searchQuery) ||
+                    m.format.toLowerCase().includes(searchQuery) ||
+                    m.genres.some(g => g.toLowerCase().includes(searchQuery));
+
+                // Format match
+                const matchFormat = !formatFilter || m.format === formatFilter;
+
+                // Genre match
+                const matchGenre = !genreFilter || m.genres.includes(genreFilter);
+
+                // Actor match
+                const matchActor = !actorFilter || m.actor === actorFilter;
+
+                // Letter match
+                const matchLetter = !currentLetterFilter || getSortTitle(m.title).toUpperCase().startsWith(currentLetterFilter);
+
+                return matchSearch && matchFormat && matchGenre && matchActor && matchLetter;
+            }).sort((a, b) => {
+                if (sortBy === 'title-asc') {
+                    return getSortTitle(a.title).localeCompare(getSortTitle(b.title));
+                } else if (sortBy === 'title-desc') {
+                    return getSortTitle(b.title).localeCompare(getSortTitle(a.title));
+                } else if (sortBy === 'actor-asc') {
+                    return a.actor.localeCompare(b.actor);
+                } else if (sortBy === 'genre-asc') {
+                    return a.genres[0].localeCompare(b.genres[0]);
+                } else if (sortBy === 'year-desc') {
+                    return String(b.year).localeCompare(String(a.year));
+                } else if (sortBy === 'year-asc') {
+                    return String(a.year).localeCompare(String(b.year));
+                }
+                return 0;
+            });
+        }
+
+        function updateActiveBadges() {
+            const container = document.getElementById('active-badges');
+            container.innerHTML = '';
+
+            const genreFilter = document.getElementById('genre-select').value;
+            const actorFilter = document.getElementById('actor-select').value;
+            const formatFilter = document.getElementById('format-select').value;
+            const searchQuery = document.getElementById('search-input').value.trim();
+
+            if (formatFilter) {
+                container.appendChild(createBadge(`Format: ${formatFilter}`, () => {
+                    document.getElementById('format-select').value = '';
+                    applyFilters();
+                }));
+            }
+            if (genreFilter) {
+                container.appendChild(createBadge(`Genre: ${genreFilter}`, () => {
+                    document.getElementById('genre-select').value = '';
+                    applyFilters();
+                }));
+            }
+            if (actorFilter) {
+                container.appendChild(createBadge(`Actor: ${actorFilter}`, () => {
+                    document.getElementById('actor-select').value = '';
+                    applyFilters();
+                }));
+            }
+            if (currentLetterFilter) {
+                container.appendChild(createBadge(`Letter: ${currentLetterFilter}`, () => {
+                    selectLetter(null);
+                }));
+            }
+            if (searchQuery) {
+                container.appendChild(createBadge(`Search: "${searchQuery}"`, () => {
+                    clearSearch();
+                }));
+            }
+        }
+
+        function createBadge(text, onRemove) {
+            const badge = document.createElement('span');
+            badge.className = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs bg-indigo-900/50 text-indigo-200 border border-indigo-700/50 shadow-sm";
+            badge.innerHTML = `<span>${text}</span>`;
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = "hover:text-white transition ml-0.5";
+            closeBtn.innerHTML = '<i data-lucide="x" class="w-3 h-3"></i>';
+            closeBtn.onclick = onRemove;
+            
+            badge.appendChild(closeBtn);
+            return badge;
+        }
+
+        function renderMovies() {
+            const filtered = getFilteredMovies();
+            const container = document.getElementById('movie-container');
+            
+            // Update statistics
+            document.getElementById('stat-showing-count').textContent = filtered.length;
+            document.getElementById('stat-total-count').textContent = movies.length;
+            updateActiveBadges();
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 bg-slate-900/40 rounded-2xl border border-slate-800">
+                        <i data-lucide="film" class="w-12 h-12 mx-auto text-slate-600 mb-3"></i>
+                        <h3 class="text-lg font-semibold text-slate-300">No movies found</h3>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">Try adjusting your filters, clearing your search query, or selecting another letter.</p>
+                        <button onclick="resetFilters()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-lg transition shadow-md">
+                            Reset All Filters
+                        </button>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            if (currentViewMode === 'grid') {
+                renderGridView(filtered, container);
+            } else if (currentViewMode === 'list') {
+                renderListView(filtered, container);
+            } else if (currentViewMode === 'grouped') {
+                renderGroupedView(filtered, container);
+            }
+
+            lucide.createIcons();
+        }
+
+        function renderGridView(items, container) {
+            let html = `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">`;
+            
+            items.forEach(m => {
+                const formatClass = m.format === 'Blu-Ray' ? 'bg-sky-500/20 text-sky-300 border-sky-400/40' : 'bg-amber-500/20 text-amber-300 border-amber-400/40';
+                
+                html += `
+                    <div onclick="openModal(${m.id})" class="film-card bg-slate-900 border border-slate-800 rounded-xl overflow-hidden cursor-pointer flex flex-col justify-between group shadow-lg hover:border-indigo-500/50 hover:shadow-indigo-500/10">
+                        <!-- Top Mini Poster Banner -->
+                        <div class="h-28 bg-gradient-to-br ${m.accent} relative p-4 flex flex-col justify-between overflow-hidden">
+                            <div class="absolute -right-4 -bottom-4 opacity-15 transform rotate-12 group-hover:scale-110 transition duration-300">
+                                <i data-lucide="disc" class="w-24 h-24 text-white"></i>
+                            </div>
+                            <div class="flex items-center justify-between z-10">
+                                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-black/40 backdrop-blur-md text-white/90 border border-white/10">
+                                    ${m.year}
+                                </span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded border backdrop-blur-sm ${formatClass}">
+                                    ${m.format}
+                                </span>
+                            </div>
+                            <i data-lucide="play-circle" class="w-8 h-8 text-white/70 group-hover:text-white group-hover:scale-110 transition z-10"></i>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                            <div>
+                                <h3 class="font-bold text-slate-100 text-base leading-snug group-hover:text-indigo-400 transition line-clamp-2">
+                                    ${m.title}
+                                </h3>
+                                <p class="text-xs text-slate-400 flex items-center gap-1.5 mt-1">
+                                    <i data-lucide="user" class="w-3.5 h-3.5 text-indigo-400 flex-shrink-0"></i>
+                                    <span class="truncate">${m.actor}</span>
+                                </p>
+                            </div>
+
+                            <!-- Genre Badges -->
+                            <div class="flex flex-wrap gap-1 pt-1">
+                                ${m.genres.map(g => `<span onclick="filterByGenre('${g}', event)" class="text-[10px] px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700/60 transition">${g}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function renderListView(items, container) {
+            let html = `
+                <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-300">
+                            <thead class="bg-slate-950 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
+                                <tr>
+                                    <th class="py-3.5 px-4">Title</th>
+                                    <th class="py-3.5 px-4">Format</th>
+                                    <th class="py-3.5 px-4">Lead Actor</th>
+                                    <th class="py-3.5 px-4">Genre(s)</th>
+                                    <th class="py-3.5 px-4 text-center">Year</th>
+                                    <th class="py-3.5 px-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60">
+            `;
+
+            items.forEach(m => {
+                const formatClass = m.format === 'Blu-Ray' ? 'bg-sky-500/20 text-sky-300 border-sky-400/30' : 'bg-amber-500/20 text-amber-300 border-amber-400/30';
+                html += `
+                    <tr class="hover:bg-slate-800/50 transition cursor-pointer group" onclick="openModal(${m.id})">
+                        <td class="py-3 px-4 font-semibold text-slate-100 group-hover:text-indigo-400">
+                            ${m.title}
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${formatClass}">${m.format}</span>
+                        </td>
+                        <td class="py-3 px-4 text-slate-300 flex items-center gap-2">
+                            <i data-lucide="user" class="w-3.5 h-3.5 text-indigo-400 flex-shrink-0"></i>
+                            <span onclick="filterByActor('${m.actor}', event)" class="hover:underline hover:text-white">${m.actor}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex flex-wrap gap-1">
+                                ${m.genres.map(g => `<span onclick="filterByGenre('${g}', event)" class="text-[10px] px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700/50 transition">${g}</span>`).join('')}
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-center text-xs font-medium text-slate-400">
+                            ${m.year}
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <button class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded border border-slate-700 transition">
+                                Details
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function renderGroupedView(items, container) {
+            // Group items by letter
+            const groups = {};
+            items.forEach(m => {
+                const letter = getSortTitle(m.title).charAt(0).toUpperCase();
+                if (!groups[letter]) groups[letter] = [];
+                groups[letter].push(m);
+            });
+
+            const sortedLetters = Object.keys(groups).sort();
+            let html = `<div class="space-y-6">`;
+
+            sortedLetters.forEach(letter => {
+                html += `
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 sm:p-5 shadow-md">
+                        <div class="flex items-center space-x-3 mb-4 border-b border-slate-800 pb-2">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center text-base shadow-md">
+                                ${letter}
+                            </div>
+                            <span class="text-xs font-medium text-slate-400">${groups[letter].length} Title${groups[letter].length > 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                `;
+
+                groups[letter].forEach(m => {
+                    const formatClass = m.format === 'Blu-Ray' ? 'text-sky-400' : 'text-amber-400';
+                    html += `
+                        <div onclick="openModal(${m.id})" class="p-3 bg-slate-950/60 hover:bg-slate-800/80 border border-slate-800 hover:border-indigo-500/40 rounded-lg cursor-pointer transition flex justify-between items-center group">
+                            <div>
+                                <h4 class="font-semibold text-xs text-slate-200 group-hover:text-indigo-300 transition line-clamp-1">${m.title}</h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                                    <span>${m.actor}</span>
+                                    <span class="text-[9px] font-bold ${formatClass}">[${m.format}]</span>
+                                </p>
+                            </div>
+                            <span class="text-[10px] text-slate-500 font-mono pl-2">${m.year}</span>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function filterByGenre(genre, event) {
+            if (event) event.stopPropagation();
+            document.getElementById('genre-select').value = genre;
+            applyFilters();
+        }
+
+        function filterByActor(actor, event) {
+            if (event) event.stopPropagation();
+            document.getElementById('actor-select').value = actor;
+            applyFilters();
+        }
+
+        function selectLetter(letter) {
+            currentLetterFilter = letter;
+            initControls();
+            applyFilters();
+        }
+
+        function applyFilters() {
+            renderMovies();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('clear-search').classList.add('hidden');
+            applyFilters();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('clear-search').classList.add('hidden');
+            document.getElementById('format-select').value = '';
+            document.getElementById('genre-select').value = '';
+            document.getElementById('actor-select').value = '';
+            document.getElementById('sort-select').value = 'title-asc';
+            currentLetterFilter = null;
+            initControls();
+            applyFilters();
+        }
+
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            
+            ['grid', 'list', 'grouped'].forEach(m => {
+                const btn = document.getElementById(`view-${m}-btn`);
+                if (m === mode) {
+                    btn.className = "px-2.5 py-1 rounded text-xs font-medium flex items-center space-x-1 transition bg-indigo-600 text-white shadow-sm";
+                } else {
+                    btn.className = "px-2.5 py-1 rounded text-xs font-medium flex items-center space-x-1 transition text-slate-400 hover:text-white";
+                }
+            });
+
+            renderMovies();
+        }
+
+        // Add Movie Manual Functionality
+        function openAddMovieModal() {
+            const modal = document.getElementById('add-movie-modal');
+            const card = document.getElementById('add-modal-card');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeAddMovieModal() {
+            const modal = document.getElementById('add-movie-modal');
+            const card = document.getElementById('add-modal-card');
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('add-movie-form').reset();
+            }, 200);
+        }
+
+        function handleAddMovieSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('add-title').value.trim();
+            const actor = document.getElementById('add-actor').value.trim();
+            const format = document.getElementById('add-format').value;
+            const genre1 = document.getElementById('add-genre1').value.trim();
+            const genre2 = document.getElementById('add-genre2').value.trim();
+            const year = document.getElementById('add-year').value.trim();
+            const accent = document.getElementById('add-accent').value;
+
+            if (!title || !actor || !genre1 || !year) return;
+
+            const genres = [genre1];
+            if (genre2) genres.push(genre2);
+
+            const newMovie = {
+                id: Date.now(),
+                title,
+                actor,
+                genres,
+                format,
+                year,
+                accent
+            };
+
+            movies.push(newMovie);
+            initControls();
+            applyFilters();
+            closeAddMovieModal();
+        }
+
+        function openModal(movieId) {
+            const movie = movies.find(m => m.id === movieId);
+            if (!movie) return;
+
+            const formatClass = movie.format === 'Blu-Ray' ? 'bg-sky-500/30 text-sky-200 border-sky-400/50' : 'bg-amber-500/30 text-amber-200 border-amber-400/50';
+
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div class="space-y-4">
+                    <div class="p-4 rounded-xl bg-gradient-to-br ${movie.accent} text-white shadow-inner relative">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-black/40 border border-white/20">
+                                Released: ${movie.year}
+                            </span>
+                            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded border ${formatClass}">
+                                ${movie.format}
+                            </span>
+                        </div>
+                        <h2 class="text-xl font-black mt-2 leading-tight">${movie.title}</h2>
+                    </div>
+
+                    <div class="space-y-3 text-xs text-slate-300">
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="user" class="w-4 h-4 text-indigo-400 mt-0.5"></i>
+                            <div>
+                                <span class="text-slate-400 block font-medium">Lead Actor / Cast:</span>
+                                <span class="font-semibold text-slate-100 text-sm">${movie.actor}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="disc" class="w-4 h-4 text-indigo-400 mt-0.5"></i>
+                            <div>
+                                <span class="text-slate-400 block font-medium">Physical Media Format:</span>
+                                <span class="font-semibold text-slate-100">${movie.format}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="tags" class="w-4 h-4 text-indigo-400 mt-0.5"></i>
+                            <div>
+                                <span class="text-slate-400 block font-medium mb-1">Genres:</span>
+                                <div class="flex flex-wrap gap-1">
+                                    ${movie.genres.map(g => `<span class="px-2 py-0.5 bg-slate-800 text-indigo-300 rounded border border-slate-700">${g}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-slate-950/80 rounded-lg border border-slate-800 mt-3">
+                            <span class="text-slate-400 font-medium block mb-1">Collection Metadata:</span>
+                            <p class="text-[11px] text-slate-400 leading-relaxed">
+                                Title indexed under <strong>${getSortTitle(movie.title).charAt(0).toUpperCase()}</strong> in combined alphabetical list.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex justify-end">
+                        <button onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            lucide.createIcons();
+            const modal = document.getElementById('movie-modal');
+            const card = document.getElementById('modal-card');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('movie-modal');
+            const card = document.getElementById('modal-card');
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // Close modal when clicking backdrop
+        document.getElementById('movie-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'movie-modal') closeModal();
+        });
+        document.getElementById('add-movie-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'add-movie-modal') closeAddMovieModal();
+        });
+
+        // Initialize App on DOM Load
+        window.onload = function() {
+            initControls();
+            renderMovies();
+        };
+    </script>
+</body>
+</html>
