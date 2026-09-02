@@ -129,15 +129,16 @@
                     </div>
                 </div>
 
-                <!-- Format Selector (DVD / Blu-Ray) -->
+                <!-- Format Selector (DVD / Blu-Ray / Apple Stream) -->
                 <div class="md:col-span-2">
                     <label for="format-select" class="block text-xs font-semibold text-slate-300 mb-1">Format</label>
                     <div class="relative">
-                        <select id="format-select" onchange="applyFilters()" 
+                        <select id="format-select" onchange="applyFilters()"
                             class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition appearance-none cursor-pointer">
                             <option value="">All Formats</option>
                             <option value="Blu-Ray">Blu-Ray</option>
                             <option value="DVD">DVD</option>
+                            <option value="Apple Stream">Apple Stream</option>
                         </select>
                         <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
                     </div>
@@ -252,19 +253,24 @@
                         class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-slate-300 font-semibold mb-1">Lead Actor *</label>
-                        <input type="text" id="add-actor" required placeholder="e.g. Leonardo DiCaprio"
-                            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-slate-300 font-semibold mb-1">Format *</label>
-                        <select id="add-format" required
-                            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
-                            <option value="Blu-Ray" selected>Blu-Ray</option>
-                            <option value="DVD">DVD</option>
-                        </select>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Lead Actor *</label>
+                    <input type="text" id="add-actor" required placeholder="e.g. Leonardo DiCaprio"
+                        class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Format(s) * <span class="text-slate-500 font-normal">(tick all that apply)</span></label>
+                    <div class="flex flex-wrap gap-4 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5">
+                        <label class="flex items-center gap-1.5 text-slate-200 cursor-pointer select-none">
+                            <input type="checkbox" class="add-format-checkbox accent-indigo-500" value="DVD"> DVD
+                        </label>
+                        <label class="flex items-center gap-1.5 text-slate-200 cursor-pointer select-none">
+                            <input type="checkbox" class="add-format-checkbox accent-indigo-500" value="Blu-Ray"> Blu-Ray
+                        </label>
+                        <label class="flex items-center gap-1.5 text-slate-200 cursor-pointer select-none">
+                            <input type="checkbox" class="add-format-checkbox accent-indigo-500" value="Apple Stream"> Apple Stream
+                        </label>
                     </div>
                 </div>
 
@@ -317,246 +323,290 @@
         // Combined DVD and Blu-Ray catalog
         const movies = [
             // --- DVDs ---
-            { id: 1, title: "28 Days Later", actor: "Cillian Murphy", genres: ["Horror", "Sci-Fi", "Thriller"], format: "DVD", year: 2002, accent: "from-red-950 to-slate-950" },
-            { id: 2, title: "A Beautiful Mind", actor: "Russell Crowe", genres: ["Biography", "Drama"], format: "DVD", year: 2001, accent: "from-amber-800 to-indigo-950" },
-            { id: 3, title: "A Bridge Too Far", actor: "Dirk Bogarde", genres: ["Drama", "History", "War"], format: "DVD", year: 1977, accent: "from-emerald-900 to-stone-950" },
-            { id: 4, title: "Alien Quadrilogy", actor: "Sigourney Weaver", genres: ["Sci-Fi", "Horror", "Action"], format: "DVD", year: "1979-1997", accent: "from-emerald-950 to-slate-950" },
-            { id: 5, title: "Along Came a Spider", actor: "Morgan Freeman", genres: ["Drama", "Mystery", "Thriller"], format: "DVD", year: 2001, accent: "from-slate-800 to-zinc-950" },
-            { id: 6, title: "Amadeus", actor: "F. Murray Abraham", genres: ["Biography", "Drama", "Music"], format: "DVD", year: 1984, accent: "from-amber-700 to-yellow-950" },
-            { id: 7, title: "American Beauty", actor: "Kevin Spacey", genres: ["Drama"], format: "DVD", year: 1999, accent: "from-rose-900 to-slate-950" },
-            { id: 8, title: "Apollo 13", actor: "Tom Hanks", genres: ["Adventure", "Biography", "Drama"], format: "DVD", year: 1995, accent: "from-sky-800 to-slate-950" },
-            { id: 9, title: "Armageddon", actor: "Bruce Willis", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 1998, accent: "from-orange-900 to-stone-950" },
-            { id: 10, title: "As Good as It Gets", actor: "Jack Nicholson", genres: ["Comedy", "Drama", "Romance"], format: "DVD", year: 1997, accent: "from-rose-800 to-slate-950" },
-            { id: 11, title: "Back to the Future", actor: "Michael J. Fox", genres: ["Adventure", "Comedy", "Sci-Fi"], format: "DVD", year: 1985, accent: "from-cyan-700 to-indigo-950" },
-            { id: 12, title: "Back to the Future Part II", actor: "Michael J. Fox", genres: ["Adventure", "Comedy", "Sci-Fi"], format: "DVD", year: 1989, accent: "from-cyan-800 to-blue-950" },
-            { id: 13, title: "Back to the Future Part III", actor: "Michael J. Fox", genres: ["Adventure", "Comedy", "Sci-Fi", "Western"], format: "DVD", year: 1990, accent: "from-amber-900 to-indigo-950" },
-            { id: 14, title: "Batman The Movie (LEGO)", actor: "Troy Baker", genres: ["Animation", "Action", "Comedy"], format: "DVD", year: 2013, accent: "from-yellow-700 to-slate-950" },
-            { id: 15, title: "Battle of Britain", actor: "Laurence Olivier", genres: ["Action", "Drama", "War"], format: "DVD", year: 1969, accent: "from-sky-900 to-stone-950" },
-            { id: 16, title: "Behind Enemy Lines", actor: "Owen Wilson", genres: ["Action", "Drama", "War"], format: "DVD", year: 2001, accent: "from-slate-800 to-blue-950" },
-            { id: 17, title: "Blade", actor: "Wesley Snipes", genres: ["Action", "Horror", "Sci-Fi"], format: "DVD", year: 1998, accent: "from-red-950 to-zinc-950" },
-            { id: 18, title: "Blade Runner", actor: "Harrison Ford", genres: ["Action", "Drama", "Sci-Fi"], format: "DVD", year: 1982, accent: "from-indigo-950 to-slate-950" },
-            { id: 19, title: "Blood Diamond", actor: "Leonardo DiCaprio", genres: ["Action", "Adventure", "Drama"], format: "DVD", year: 2006, accent: "from-red-900 to-slate-950" },
-            { id: 20, title: "Breakfast at Tiffany's", actor: "Audrey Hepburn", genres: ["Comedy", "Drama", "Romance"], format: "DVD", year: 1961, accent: "from-pink-800 to-teal-950" },
-            { id: 21, title: "Casino", actor: "Robert De Niro", genres: ["Crime", "Drama"], format: "DVD", year: 1995, accent: "from-yellow-800 to-red-950" },
-            { id: 22, title: "Chocolat", actor: "Juliette Binoche", genres: ["Drama", "Romance"], format: "DVD", year: 2000, accent: "from-amber-900 to-stone-950" },
-            { id: 23, title: "Contagion", actor: "Marion Cotillard", genres: ["Drama", "Thriller"], format: "DVD", year: 2011, accent: "from-teal-800 to-slate-950" },
-            { id: 24, title: "DeJaVu", actor: "Denzel Washington", genres: ["Action", "Crime", "Sci-Fi", "Thriller"], format: "DVD", year: 2006, accent: "from-violet-900 to-slate-950" },
-            { id: 25, title: "Deep Impact", actor: "Robert Duvall", genres: ["Action", "Drama", "Sci-Fi"], format: "DVD", year: 1998, accent: "from-slate-800 to-indigo-950" },
-            { id: 26, title: "District 9", actor: "Sharlto Copley", genres: ["Action", "Sci-Fi", "Thriller"], format: "DVD", year: 2009, accent: "from-amber-900 to-stone-950" },
-            { id: 27, title: "Dog Day Afternoon", actor: "Al Pacino", genres: ["Biography", "Crime", "Drama"], format: "DVD", year: 1975, accent: "from-stone-700 to-amber-950" },
-            { id: 28, title: "Donnie Darko", actor: "Jake Gyllenhaal", genres: ["Drama", "Mystery", "Sci-Fi"], format: "DVD", year: 2001, accent: "from-indigo-900 to-slate-950" },
-            { id: 29, title: "Dr. Dolittle", actor: "Eddie Murphy", genres: ["Comedy", "Family", "Fantasy"], format: "DVD", year: 1998, accent: "from-emerald-700 to-slate-950" },
-            { id: 30, title: "Dr. Seuss' Horton Hears a Who!", actor: "Jim Carrey", genres: ["Animation", "Adventure", "Comedy"], format: "DVD", year: 2008, accent: "from-sky-600 to-indigo-950" },
-            { id: 31, title: "Eternal Sunshine of the Spotless Mind", actor: "Jim Carrey", genres: ["Drama", "Romance", "Sci-Fi"], format: "DVD", year: 2004, accent: "from-cyan-800 to-indigo-950" },
-            { id: 32, title: "Evil Dead Trilogy", actor: "Bruce Campbell", genres: ["Comedy", "Horror", "Fantasy"], format: "DVD", year: "1981-1992", accent: "from-red-950 to-slate-950" },
-            { id: 33, title: "Fargo", actor: "Frances McDormand", genres: ["Crime", "Drama", "Thriller"], format: "DVD", year: 1996, accent: "from-sky-900 to-slate-950" },
-            { id: 34, title: "Field of Dreams", actor: "Kevin Costner", genres: ["Drama", "Family", "Fantasy"], format: "DVD", year: 1989, accent: "from-emerald-800 to-slate-950" },
-            { id: 35, title: "Gangs of New York", actor: "Leonardo DiCaprio", genres: ["Crime", "Drama"], format: "DVD", year: 2002, accent: "from-red-900 to-amber-950" },
-            { id: 36, title: "Girl, Interrupted", actor: "Winona Ryder", genres: ["Biography", "Drama"], format: "DVD", year: 1999, accent: "from-slate-700 to-zinc-900" },
-            { id: 37, title: "Gladiator", actor: "Russell Crowe", genres: ["Action", "Adventure", "Drama"], format: "DVD", year: 2000, accent: "from-amber-900 to-stone-950" },
-            { id: 38, title: "Goldmember", actor: "Mike Myers", genres: ["Action", "Comedy", "Crime"], format: "DVD", year: 2002, accent: "from-yellow-600 to-amber-950" },
-            { id: 39, title: "Gran Torino", actor: "Clint Eastwood", genres: ["Drama"], format: "DVD", year: 2008, accent: "from-neutral-800 to-slate-950" },
-            { id: 40, title: "Gravity", actor: "Sandra Bullock", genres: ["Drama", "Sci-Fi", "Thriller"], format: "DVD", year: 2013, accent: "from-slate-800 to-black" },
-            { id: 41, title: "Gremlins", actor: "Zach Galligan", genres: ["Comedy", "Fantasy", "Horror"], format: "DVD", year: 1984, accent: "from-emerald-900 to-rose-950" },
-            { id: 42, title: "Happy Feet", actor: "Elijah Wood", genres: ["Animation", "Adventure", "Comedy"], format: "DVD", year: 2006, accent: "from-sky-700 to-blue-950" },
-            { id: 43, title: "Hidalgo", actor: "Viggo Mortensen", genres: ["Action", "Adventure", "Biography"], format: "DVD", year: 2004, accent: "from-amber-800 to-stone-950" },
-            { id: 44, title: "Home Alone 2: Lost in New York", actor: "Macaulay Culkin", genres: ["Comedy", "Family"], format: "DVD", year: 1992, accent: "from-green-800 to-red-950" },
-            { id: 45, title: "I Am Legend", actor: "Will Smith", genres: ["Action", "Drama", "Sci-Fi"], format: "DVD", year: 2007, accent: "from-amber-900 to-slate-950" },
-            { id: 46, title: "In Her Shoes", actor: "Cameron Diaz", genres: ["Comedy", "Drama", "Romance"], format: "DVD", year: 2005, accent: "from-rose-700 to-purple-950" },
-            { id: 47, title: "In Time", actor: "Justin Timberlake", genres: ["Action", "Sci-Fi", "Thriller"], format: "DVD", year: 2011, accent: "from-emerald-800 to-slate-950" },
-            { id: 48, title: "In the Night Garden... Hello Igglepiggle!", actor: "Derek Jacobi", genres: ["Children", "Family"], format: "DVD", year: 2007, accent: "from-teal-700 to-sky-950" },
-            { id: 49, title: "Indiana Jones and the Kingdom of the Crystal Skull", actor: "Harrison Ford", genres: ["Action", "Adventure"], format: "DVD", year: 2008, accent: "from-amber-800 to-stone-950" },
-            { id: 50, title: "Indiana Jones and the Last Crusade", actor: "Harrison Ford", genres: ["Action", "Adventure"], format: "DVD", year: 1989, accent: "from-amber-900 to-orange-950" },
-            { id: 51, title: "Indiana Jones and the Temple of Doom", actor: "Harrison Ford", genres: ["Action", "Adventure"], format: "DVD", year: 1984, accent: "from-red-900 to-amber-950" },
-            { id: 52, title: "Inferno", actor: "Tom Hanks", genres: ["Action", "Adventure", "Crime", "Mystery"], format: "DVD", year: 2016, accent: "from-red-950 to-stone-950" },
-            { id: 53, title: "Interview with the Vampire", actor: "Tom Cruise", genres: ["Drama", "Fantasy", "Horror"], format: "DVD", year: 1994, accent: "from-purple-950 to-slate-950" },
-            { id: 54, title: "Jarhead", actor: "Jake Gyllenhaal", genres: ["Action", "Biography", "Drama", "War"], format: "DVD", year: 2005, accent: "from-amber-900 to-stone-950" },
-            { id: 55, title: "JFK", actor: "Kevin Costner", genres: ["Drama", "History", "Thriller"], format: "DVD", year: 1991, accent: "from-slate-800 to-stone-950" },
-            { id: 56, title: "Jingle All the Way", actor: "Arnold Schwarzenegger", genres: ["Comedy", "Family"], format: "DVD", year: 1996, accent: "from-red-800 to-emerald-950" },
-            { id: 57, title: "K-PAX", actor: "Kevin Spacey", genres: ["Drama", "Sci-Fi"], format: "DVD", year: 2001, accent: "from-indigo-900 to-slate-950" },
-            { id: 58, title: "Little Miss Sunshine", actor: "Steve Carell", genres: ["Comedy", "Drama"], format: "DVD", year: 2006, accent: "from-yellow-600 to-amber-950" },
-            { id: 59, title: "Man on Fire", actor: "Denzel Washington", genres: ["Action", "Crime", "Drama", "Thriller"], format: "DVD", year: 2004, accent: "from-orange-900 to-slate-950" },
-            { id: 60, title: "Meet Joe Black", actor: "Brad Pitt", genres: ["Drama", "Fantasy", "Romance"], format: "DVD", year: 1998, accent: "from-indigo-900 to-slate-950" },
-            { id: 61, title: "Meet the Parents", actor: "Ben Stiller", genres: ["Comedy", "Romance"], format: "DVD", year: 2000, accent: "from-blue-700 to-slate-950" },
-            { id: 62, title: "Men in Black", actor: "Will Smith", genres: ["Action", "Adventure", "Comedy", "Sci-Fi"], format: "DVD", year: 1997, accent: "from-slate-800 to-indigo-950" },
-            { id: 63, title: "Michael Clayton", actor: "George Clooney", genres: ["Crime", "Drama", "Mystery", "Thriller"], format: "DVD", year: 2007, accent: "from-slate-800 to-zinc-950" },
-            { id: 64, title: "Mission: Impossible The 5 Movie Collection", actor: "Tom Cruise", genres: ["Action", "Adventure", "Thriller"], format: "DVD", year: "1996-2015", accent: "from-red-800 to-slate-950" },
-            { id: 65, title: "Moneyball", actor: "Brad Pitt", genres: ["Biography", "Drama", "Sport"], format: "DVD", year: 2011, accent: "from-emerald-800 to-slate-950" },
-            { id: 66, title: "Monty Python's Life of Brian", actor: "Graham Chapman", genres: ["Comedy"], format: "DVD", year: 1979, accent: "from-amber-700 to-rose-950" },
-            { id: 67, title: "Monty Python's The Meaning of Life", actor: "Graham Chapman", genres: ["Comedy", "Musical"], format: "DVD", year: 1983, accent: "from-purple-800 to-slate-950" },
-            { id: 68, title: "Night at the Museum", actor: "Ben Stiller", genres: ["Adventure", "Comedy", "Family"], format: "DVD", year: 2006, accent: "from-amber-700 to-blue-950" },
-            { id: 69, title: "Night at the Museum: Secret of the Tomb", actor: "Ben Stiller", genres: ["Adventure", "Comedy", "Family"], format: "DVD", year: 2014, accent: "from-indigo-800 to-amber-950" },
-            { id: 70, title: "O Brother, Where Art Thou?", actor: "George Clooney", genres: ["Comedy", "Crime", "Music"], format: "DVD", year: 2000, accent: "from-amber-700 to-stone-950" },
-            { id: 71, title: "Ocean's Eleven", actor: "George Clooney", genres: ["Crime", "Thriller"], format: "DVD", year: 2001, accent: "from-slate-800 to-indigo-950" },
-            { id: 72, title: "Ocean's Thirteen", actor: "George Clooney", genres: ["Crime", "Thriller"], format: "DVD", year: 2007, accent: "from-slate-800 to-purple-950" },
-            { id: 73, title: "Once Upon a Time in the West", actor: "Henry Fonda", genres: ["Western"], format: "DVD", year: 1968, accent: "from-amber-900 to-orange-950" },
-            { id: 74, title: "One Flew Over the Cuckoo's Nest", actor: "Jack Nicholson", genres: ["Drama"], format: "DVD", year: 1975, accent: "from-stone-700 to-slate-950" },
-            { id: 75, title: "Outbreak", actor: "Dustin Hoffman", genres: ["Action", "Drama", "Thriller"], format: "DVD", year: 1995, accent: "from-emerald-900 to-slate-950" },
-            { id: 76, title: "Phenomenon", actor: "John Travolta", genres: ["Drama", "Fantasy", "Romance"], format: "DVD", year: 1996, accent: "from-sky-800 to-indigo-950" },
-            { id: 77, title: "Platoon", actor: "Charlie Sheen", genres: ["Drama", "War"], format: "DVD", year: 1986, accent: "from-emerald-900 to-stone-950" },
-            { id: 78, title: "Predator", actor: "Arnold Schwarzenegger", genres: ["Action", "Adventure", "Horror", "Sci-Fi"], format: "DVD", year: 1987, accent: "from-emerald-800 to-red-950" },
-            { id: 79, title: "Ray", actor: "Jamie Foxx", genres: ["Biography", "Drama", "Music"], format: "DVD", year: 2004, accent: "from-purple-900 to-indigo-950" },
-            { id: 80, title: "Rise of the Planet of the Apes", actor: "James Franco", genres: ["Action", "Drama", "Sci-Fi"], format: "DVD", year: 2011, accent: "from-stone-800 to-emerald-950" },
-            { id: 81, title: "Salt", actor: "Angelina Jolie", genres: ["Action", "Mystery", "Thriller"], format: "DVD", year: 2010, accent: "from-slate-800 to-red-950" },
-            { id: 82, title: "Seabiscuit", actor: "Tobey Maguire", genres: ["Biography", "Drama", "History", "Sport"], format: "DVD", year: 2003, accent: "from-amber-800 to-stone-950" },
-            { id: 83, title: "Serendipity", actor: "John Cusack", genres: ["Comedy", "Romance"], format: "DVD", year: 2001, accent: "from-rose-800 to-indigo-950" },
-            { id: 84, title: "Shallow Hal", actor: "Gwyneth Paltrow", genres: ["Comedy", "Fantasy", "Romance"], format: "DVD", year: 2001, accent: "from-pink-700 to-slate-950" },
-            { id: 85, title: "Sherlock Holmes", actor: "Robert Downey Jr.", genres: ["Action", "Adventure", "Mystery"], format: "DVD", year: 2009, accent: "from-amber-900 to-slate-950" },
-            { id: 86, title: "Shrek", actor: "Mike Myers", genres: ["Animation", "Adventure", "Comedy", "Fantasy"], format: "DVD", year: 2001, accent: "from-lime-800 to-emerald-950" },
-            { id: 87, title: "Shrek 2", actor: "Mike Myers", genres: ["Animation", "Adventure", "Comedy", "Fantasy"], format: "DVD", year: 2004, accent: "from-lime-700 to-teal-950" },
-            { id: 88, title: "Signs", actor: "Mel Gibson", genres: ["Drama", "Mystery", "Sci-Fi"], format: "DVD", year: 2002, accent: "from-emerald-950 to-slate-950" },
-            { id: 89, title: "Snatch", actor: "Jason Statham", genres: ["Comedy", "Crime"], format: "DVD", year: 2000, accent: "from-stone-800 to-indigo-950" },
-            { id: 90, title: "Spanglish", actor: "Adam Sandler", genres: ["Comedy", "Drama", "Romance"], format: "DVD", year: 2004, accent: "from-orange-800 to-slate-950" },
-            { id: 91, title: "Spider-Man", actor: "Tobey Maguire", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 2002, accent: "from-red-800 to-blue-950" },
-            { id: 92, title: "Spy Game", actor: "Robert Redford", genres: ["Action", "Crime", "Thriller"], format: "DVD", year: 2001, accent: "from-amber-900 to-slate-950" },
-            { id: 93, title: "Star Trek First Contact", actor: "Patrick Stewart", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 1996, accent: "from-blue-900 to-slate-950" },
-            { id: 94, title: "Star Trek Generations", actor: "Patrick Stewart", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 1994, accent: "from-blue-800 to-indigo-950" },
-            { id: 95, title: "Star Trek Insurrection", actor: "Patrick Stewart", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 1998, accent: "from-indigo-800 to-teal-950" },
-            { id: 96, title: "Star Trek Into Darkness", actor: "Chris Pine", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 2013, accent: "from-slate-800 to-blue-950" },
-            { id: 97, title: "Star Trek: The Motion Picture", actor: "William Shatner", genres: ["Adventure", "Mystery", "Sci-Fi"], format: "DVD", year: 1979, accent: "from-purple-900 to-slate-950" },
-            { id: 98, title: "Star Wars", actor: "Mark Hamill", genres: ["Action", "Adventure", "Fantasy", "Sci-Fi"], format: "DVD", year: 1977, accent: "from-amber-600 to-blue-950" },
-            { id: 99, title: "Stargate", actor: "Kurt Russell", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 1994, accent: "from-cyan-900 to-amber-950" },
-            { id: 100, title: "Stigmata", actor: "Patricia Arquette", genres: ["Horror", "Mystery"], format: "DVD", year: 1999, accent: "from-red-950 to-stone-950" },
-            { id: 101, title: "Superbad", actor: "Jonah Hill", genres: ["Comedy"], format: "DVD", year: 2007, accent: "from-yellow-700 to-red-950" },
-            { id: 102, title: "Taken 2", actor: "Liam Neeson", genres: ["Action", "Crime", "Thriller"], format: "DVD", year: 2012, accent: "from-slate-800 to-stone-950" },
-            { id: 103, title: "The Abyss", actor: "Ed Harris", genres: ["Adventure", "Drama", "Sci-Fi"], format: "DVD", year: 1989, accent: "from-cyan-900 to-slate-950" },
-            { id: 104, title: "The American", actor: "George Clooney", genres: ["Action", "Crime", "Drama"], format: "DVD", year: 2010, accent: "from-stone-800 to-slate-950" },
-            { id: 105, title: "The Aviator", actor: "Leonardo DiCaprio", genres: ["Biography", "Drama"], format: "DVD", year: 2004, accent: "from-amber-800 to-slate-950" },
-            { id: 106, title: "The Body", actor: "Antonio Banderas", genres: ["Drama", "Mystery", "Thriller"], format: "DVD", year: 2001, accent: "from-stone-800 to-amber-950" },
-            { id: 107, title: "The Bourne Ultimate Collection", actor: "Matt Damon", genres: ["Action", "Mystery", "Thriller"], format: "DVD", year: "2002-2012", accent: "from-slate-800 to-blue-950" },
-            { id: 108, title: "The Butterfly Effect", actor: "Ashton Kutcher", genres: ["Drama", "Sci-Fi", "Thriller"], format: "DVD", year: 2004, accent: "from-purple-900 to-slate-950" },
-            { id: 109, title: "The Count of Monte Cristo", actor: "Jim Caviezel", genres: ["Action", "Adventure", "Drama"], format: "DVD", year: 2002, accent: "from-amber-900 to-stone-950" },
-            { id: 110, title: "The Da Vinci Code", actor: "Tom Hanks", genres: ["Mystery", "Thriller"], format: "DVD", year: 2006, accent: "from-amber-950 to-stone-950" },
-            { id: 111, title: "The Day After Tomorrow", actor: "Dennis Quaid", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 2004, accent: "from-sky-900 to-slate-950" },
-            { id: 112, title: "The Devil Wears Prada", actor: "Meryl Streep", genres: ["Comedy", "Drama"], format: "DVD", year: 2006, accent: "from-rose-800 to-purple-950" },
-            { id: 113, title: "The Exorcism of Emily Rose", actor: "Laura Linney", genres: ["Drama", "Horror", "Mystery"], format: "DVD", year: 2005, accent: "from-stone-900 to-red-950" },
-            { id: 114, title: "The Exorcist", actor: "Ellen Burstyn", genres: ["Horror"], format: "DVD", year: 1973, accent: "from-slate-900 to-red-950" },
-            { id: 115, title: "The Girl with the Dragon Tattoo", actor: "Daniel Craig", genres: ["Crime", "Drama", "Mystery"], format: "DVD", year: 2011, accent: "from-zinc-800 to-slate-950" },
-            { id: 116, title: "The Godfather", actor: "Marlon Brando", genres: ["Crime", "Drama"], format: "DVD", year: 1972, accent: "from-stone-900 to-amber-950" },
-            { id: 117, title: "The Goonies", actor: "Sean Astin", genres: ["Adventure", "Comedy", "Family"], format: "DVD", year: 1985, accent: "from-amber-700 to-indigo-950" },
-            { id: 118, title: "The Great Escape", actor: "Steve McQueen", genres: ["Adventure", "Drama", "History", "War"], format: "DVD", year: 1963, accent: "from-amber-800 to-stone-950" },
-            { id: 119, title: "The Green Mile", actor: "Tom Hanks", genres: ["Crime", "Drama", "Fantasy"], format: "DVD", year: 1999, accent: "from-emerald-900 to-slate-950" },
-            { id: 120, title: "The Italian Job", actor: "Mark Wahlberg", genres: ["Action", "Crime", "Thriller"], format: "DVD", year: 2003, accent: "from-blue-800 to-slate-950" },
-            { id: 121, title: "The King's Speech", actor: "Colin Firth", genres: ["Biography", "Drama", "History"], format: "DVD", year: 2010, accent: "from-amber-800 to-slate-950" },
-            { id: 122, title: "The Legend of Bagger Vance", actor: "Will Smith", genres: ["Drama", "Fantasy", "Sport"], format: "DVD", year: 2000, accent: "from-emerald-800 to-amber-950" },
-            { id: 123, title: "The Lord of the Rings: The Two Towers", actor: "Elijah Wood", genres: ["Action", "Adventure", "Drama", "Fantasy"], format: "DVD", year: 2002, accent: "from-amber-800 to-emerald-950" },
-            { id: 124, title: "The Mask of Zorro", actor: "Antonio Banderas", genres: ["Action", "Adventure", "Comedy"], format: "DVD", year: 1998, accent: "from-red-900 to-amber-950" },
-            { id: 125, title: "The Mummy", actor: "Brendan Fraser", genres: ["Action", "Adventure", "Fantasy"], format: "DVD", year: 1999, accent: "from-amber-800 to-stone-950" },
-            { id: 126, title: "The Mummy Returns", actor: "Brendan Fraser", genres: ["Action", "Adventure", "Fantasy"], format: "DVD", year: 2001, accent: "from-amber-900 to-orange-950" },
-            { id: 127, title: "The Mummy: Tomb of the Dragon Emperor", actor: "Brendan Fraser", genres: ["Action", "Adventure", "Fantasy"], format: "DVD", year: 2008, accent: "from-red-900 to-stone-950" },
-            { id: 128, title: "The Naked Gun", actor: "Leslie Nielsen", genres: ["Comedy", "Crime"], format: "DVD", year: 1988, accent: "from-blue-700 to-red-950" },
-            { id: 129, title: "The Nutty Professor", actor: "Eddie Murphy", genres: ["Comedy", "Romance", "Sci-Fi"], format: "DVD", year: 1996, accent: "from-indigo-700 to-pink-950" },
-            { id: 130, title: "The Polar Express", actor: "Tom Hanks", genres: ["Animation", "Adventure", "Comedy", "Family"], format: "DVD", year: 2004, accent: "from-blue-800 to-cyan-950" },
-            { id: 131, title: "The Sandlot Kids", actor: "Tom Guiry", genres: ["Comedy", "Family", "Sport"], format: "DVD", year: 1993, accent: "from-amber-700 to-emerald-950" },
-            { id: 132, title: "The Sandlot Kids 2", actor: "Max Lloyd-Jones", genres: ["Comedy", "Family", "Sport"], format: "DVD", year: 2005, accent: "from-emerald-700 to-amber-950" },
-            { id: 133, title: "The Seven Year Itch", actor: "Marilyn Monroe", genres: ["Comedy", "Romance"], format: "DVD", year: 1955, accent: "from-pink-800 to-rose-950" },
-            { id: 134, title: "The Sixth Sense", actor: "Bruce Willis", genres: ["Drama", "Mystery", "Sci-Fi", "Thriller"], format: "DVD", year: 1999, accent: "from-slate-800 to-purple-950" },
-            { id: 135, title: "The Sum of All Fears", actor: "Ben Affleck", genres: ["Action", "Drama", "Thriller"], format: "DVD", year: 2002, accent: "from-slate-800 to-red-950" },
-            { id: 136, title: "The Tailor of Panama", actor: "Pierce Brosnan", genres: ["Drama", "Thriller"], format: "DVD", year: 2001, accent: "from-teal-800 to-slate-950" },
-            { id: 137, title: "The Thomas Crown Affair", actor: "Pierce Brosnan", genres: ["Crime", "Romance", "Thriller"], format: "DVD", year: 1999, accent: "from-blue-900 to-slate-950" },
-            { id: 138, title: "The Tourist", actor: "Johnny Depp", genres: ["Action", "Romance", "Thriller"], format: "DVD", year: 2010, accent: "from-indigo-900 to-slate-950" },
-            { id: 139, title: "Three Kings", actor: "George Clooney", genres: ["Action", "Adventure", "Comedy", "War"], format: "DVD", year: 1999, accent: "from-amber-800 to-stone-950" },
-            { id: 140, title: "Total Recall", actor: "Arnold Schwarzenegger", genres: ["Action", "Sci-Fi"], format: "DVD", year: 1990, accent: "from-red-900 to-amber-950" },
-            { id: 141, title: "Transformers", actor: "Shia LaBeouf", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 2007, accent: "from-blue-900 to-slate-950" },
-            { id: 142, title: "Transformers: Revenge of the Fallen", actor: "Shia LaBeouf", genres: ["Action", "Adventure", "Sci-Fi"], format: "DVD", year: 2009, accent: "from-orange-900 to-slate-950" },
-            { id: 143, title: "Tropic Thunder", actor: "Ben Stiller", genres: ["Action", "Comedy"], format: "DVD", year: 2008, accent: "from-emerald-800 to-amber-950" },
-            { id: 144, title: "Twelve Monkeys", actor: "Bruce Willis", genres: ["Mystery", "Sci-Fi", "Thriller"], format: "DVD", year: 1995, accent: "from-slate-800 to-stone-950" },
-            { id: 145, title: "Twister", actor: "Helen Hunt", genres: ["Action", "Adventure", "Drama", "Thriller"], format: "DVD", year: 1996, accent: "from-slate-700 to-emerald-950" },
-            { id: 146, title: "Unbreakable", actor: "Bruce Willis", genres: ["Drama", "Mystery", "Sci-Fi", "Thriller"], format: "DVD", year: 2000, accent: "from-emerald-900 to-slate-950" },
-            { id: 147, title: "Valkyrie", actor: "Tom Cruise", genres: ["Drama", "History", "Thriller", "War"], format: "DVD", year: 2008, accent: "from-slate-800 to-red-950" },
-            { id: 148, title: "Vanilla Sky", actor: "Tom Cruise", genres: ["Fantasy", "Mystery", "Romance", "Sci-Fi"], format: "DVD", year: 2001, accent: "from-sky-800 to-indigo-950" },
-            { id: 149, title: "Volcano", actor: "Tommy Lee Jones", genres: ["Action", "Drama", "Sci-Fi", "Thriller"], format: "DVD", year: 1997, accent: "from-red-900 to-stone-950" },
-            { id: 150, title: "Walk the Line", actor: "Joaquin Phoenix", genres: ["Biography", "Drama", "Music", "Romance"], format: "DVD", year: 2005, accent: "from-amber-900 to-red-950" },
-            { id: 151, title: "We Bought a Zoo", actor: "Matt Damon", genres: ["Comedy", "Drama", "Family"], format: "DVD", year: 2011, accent: "from-emerald-700 to-amber-950" },
-            { id: 152, title: "Wonder Woman", actor: "Gal Gadot", genres: ["Action", "Adventure", "Fantasy"], format: "DVD", year: 2017, accent: "from-amber-700 to-red-950" },
-            { id: 153, title: "X-Men 2", actor: "Patrick Stewart", genres: ["Action", "Sci-Fi"], format: "DVD", year: 2003, accent: "from-blue-900 to-slate-950" },
+            { id: 1, title: "28 Days Later", actor: "Cillian Murphy", genres: ["Horror", "Sci-Fi", "Thriller"], formats: ["DVD"], year: 2002, accent: "from-red-950 to-slate-950" },
+            { id: 2, title: "A Beautiful Mind", actor: "Russell Crowe", genres: ["Biography", "Drama"], formats: ["DVD"], year: 2001, accent: "from-amber-800 to-indigo-950" },
+            { id: 3, title: "A Bridge Too Far", actor: "Dirk Bogarde", genres: ["Drama", "History", "War"], formats: ["DVD"], year: 1977, accent: "from-emerald-900 to-stone-950" },
+            { id: 4, title: "Alien Quadrilogy", actor: "Sigourney Weaver", genres: ["Sci-Fi", "Horror", "Action"], formats: ["DVD"], year: "1979-1997", accent: "from-emerald-950 to-slate-950" },
+            { id: 5, title: "Along Came a Spider", actor: "Morgan Freeman", genres: ["Drama", "Mystery", "Thriller"], formats: ["DVD"], year: 2001, accent: "from-slate-800 to-zinc-950" },
+            { id: 6, title: "Amadeus", actor: "F. Murray Abraham", genres: ["Biography", "Drama", "Music"], formats: ["DVD"], year: 1984, accent: "from-amber-700 to-yellow-950" },
+            { id: 7, title: "American Beauty", actor: "Kevin Spacey", genres: ["Drama"], formats: ["DVD"], year: 1999, accent: "from-rose-900 to-slate-950" },
+            { id: 8, title: "Apollo 13", actor: "Tom Hanks", genres: ["Adventure", "Biography", "Drama"], formats: ["DVD", "Apple Stream"], year: 1995, accent: "from-sky-800 to-slate-950" },
+            { id: 9, title: "Armageddon", actor: "Bruce Willis", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["DVD"], year: 1998, accent: "from-orange-900 to-stone-950" },
+            { id: 10, title: "As Good as It Gets", actor: "Jack Nicholson", genres: ["Comedy", "Drama", "Romance"], formats: ["DVD"], year: 1997, accent: "from-rose-800 to-slate-950" },
+            { id: 11, title: "Back to the Future", actor: "Michael J. Fox", genres: ["Adventure", "Comedy", "Sci-Fi"], formats: ["DVD"], year: 1985, accent: "from-cyan-700 to-indigo-950" },
+            { id: 12, title: "Back to the Future Part II", actor: "Michael J. Fox", genres: ["Adventure", "Comedy", "Sci-Fi"], formats: ["DVD"], year: 1989, accent: "from-cyan-800 to-blue-950" },
+            { id: 13, title: "Back to the Future Part III", actor: "Michael J. Fox", genres: ["Adventure", "Comedy", "Sci-Fi", "Western"], formats: ["DVD"], year: 1990, accent: "from-amber-900 to-indigo-950" },
+            { id: 14, title: "Batman The Movie (LEGO)", actor: "Troy Baker", genres: ["Animation", "Action", "Comedy"], formats: ["DVD"], year: 2013, accent: "from-yellow-700 to-slate-950" },
+            { id: 15, title: "Battle of Britain", actor: "Laurence Olivier", genres: ["Action", "Drama", "War"], formats: ["DVD"], year: 1969, accent: "from-sky-900 to-stone-950" },
+            { id: 16, title: "Behind Enemy Lines", actor: "Owen Wilson", genres: ["Action", "Drama", "War"], formats: ["DVD"], year: 2001, accent: "from-slate-800 to-blue-950" },
+            { id: 17, title: "Blade", actor: "Wesley Snipes", genres: ["Action", "Horror", "Sci-Fi"], formats: ["DVD"], year: 1998, accent: "from-red-950 to-zinc-950" },
+            { id: 18, title: "Blade Runner", actor: "Harrison Ford", genres: ["Action", "Drama", "Sci-Fi"], formats: ["DVD"], year: 1982, accent: "from-indigo-950 to-slate-950" },
+            { id: 19, title: "Blood Diamond", actor: "Leonardo DiCaprio", genres: ["Action", "Adventure", "Drama"], formats: ["DVD"], year: 2006, accent: "from-red-900 to-slate-950" },
+            { id: 20, title: "Breakfast at Tiffany's", actor: "Audrey Hepburn", genres: ["Comedy", "Drama", "Romance"], formats: ["DVD"], year: 1961, accent: "from-pink-800 to-teal-950" },
+            { id: 21, title: "Casino", actor: "Robert De Niro", genres: ["Crime", "Drama"], formats: ["DVD"], year: 1995, accent: "from-yellow-800 to-red-950" },
+            { id: 22, title: "Chocolat", actor: "Juliette Binoche", genres: ["Drama", "Romance"], formats: ["DVD"], year: 2000, accent: "from-amber-900 to-stone-950" },
+            { id: 23, title: "Contagion", actor: "Marion Cotillard", genres: ["Drama", "Thriller"], formats: ["DVD", "Apple Stream"], year: 2011, accent: "from-teal-800 to-slate-950" },
+            { id: 24, title: "DeJaVu", actor: "Denzel Washington", genres: ["Action", "Crime", "Sci-Fi", "Thriller"], formats: ["DVD"], year: 2006, accent: "from-violet-900 to-slate-950" },
+            { id: 25, title: "Deep Impact", actor: "Robert Duvall", genres: ["Action", "Drama", "Sci-Fi"], formats: ["DVD", "Apple Stream"], year: 1998, accent: "from-slate-800 to-indigo-950" },
+            { id: 26, title: "District 9", actor: "Sharlto Copley", genres: ["Action", "Sci-Fi", "Thriller"], formats: ["DVD"], year: 2009, accent: "from-amber-900 to-stone-950" },
+            { id: 27, title: "Dog Day Afternoon", actor: "Al Pacino", genres: ["Biography", "Crime", "Drama"], formats: ["DVD"], year: 1975, accent: "from-stone-700 to-amber-950" },
+            { id: 28, title: "Donnie Darko", actor: "Jake Gyllenhaal", genres: ["Drama", "Mystery", "Sci-Fi"], formats: ["DVD"], year: 2001, accent: "from-indigo-900 to-slate-950" },
+            { id: 29, title: "Dr. Dolittle", actor: "Eddie Murphy", genres: ["Comedy", "Family", "Fantasy"], formats: ["DVD"], year: 1998, accent: "from-emerald-700 to-slate-950" },
+            { id: 30, title: "Dr. Seuss' Horton Hears a Who!", actor: "Jim Carrey", genres: ["Animation", "Adventure", "Comedy"], formats: ["DVD"], year: 2008, accent: "from-sky-600 to-indigo-950" },
+            { id: 31, title: "Eternal Sunshine of the Spotless Mind", actor: "Jim Carrey", genres: ["Drama", "Romance", "Sci-Fi"], formats: ["DVD"], year: 2004, accent: "from-cyan-800 to-indigo-950" },
+            { id: 32, title: "Evil Dead Trilogy", actor: "Bruce Campbell", genres: ["Comedy", "Horror", "Fantasy"], formats: ["DVD"], year: "1981-1992", accent: "from-red-950 to-slate-950" },
+            { id: 33, title: "Fargo", actor: "Frances McDormand", genres: ["Crime", "Drama", "Thriller"], formats: ["DVD"], year: 1996, accent: "from-sky-900 to-slate-950" },
+            { id: 34, title: "Field of Dreams", actor: "Kevin Costner", genres: ["Drama", "Family", "Fantasy"], formats: ["DVD"], year: 1989, accent: "from-emerald-800 to-slate-950" },
+            { id: 35, title: "Gangs of New York", actor: "Leonardo DiCaprio", genres: ["Crime", "Drama"], formats: ["DVD"], year: 2002, accent: "from-red-900 to-amber-950" },
+            { id: 36, title: "Girl, Interrupted", actor: "Winona Ryder", genres: ["Biography", "Drama"], formats: ["DVD"], year: 1999, accent: "from-slate-700 to-zinc-900" },
+            { id: 37, title: "Gladiator", actor: "Russell Crowe", genres: ["Action", "Adventure", "Drama"], formats: ["DVD"], year: 2000, accent: "from-amber-900 to-stone-950" },
+            { id: 38, title: "Goldmember", actor: "Mike Myers", genres: ["Action", "Comedy", "Crime"], formats: ["DVD"], year: 2002, accent: "from-yellow-600 to-amber-950" },
+            { id: 39, title: "Gran Torino", actor: "Clint Eastwood", genres: ["Drama"], formats: ["DVD"], year: 2008, accent: "from-neutral-800 to-slate-950" },
+            { id: 40, title: "Gravity", actor: "Sandra Bullock", genres: ["Drama", "Sci-Fi", "Thriller"], formats: ["DVD"], year: 2013, accent: "from-slate-800 to-black" },
+            { id: 41, title: "Gremlins", actor: "Zach Galligan", genres: ["Comedy", "Fantasy", "Horror"], formats: ["DVD"], year: 1984, accent: "from-emerald-900 to-rose-950" },
+            { id: 42, title: "Happy Feet", actor: "Elijah Wood", genres: ["Animation", "Adventure", "Comedy"], formats: ["DVD"], year: 2006, accent: "from-sky-700 to-blue-950" },
+            { id: 43, title: "Hidalgo", actor: "Viggo Mortensen", genres: ["Action", "Adventure", "Biography"], formats: ["DVD"], year: 2004, accent: "from-amber-800 to-stone-950" },
+            { id: 44, title: "Home Alone 2: Lost in New York", actor: "Macaulay Culkin", genres: ["Comedy", "Family"], formats: ["DVD"], year: 1992, accent: "from-green-800 to-red-950" },
+            { id: 45, title: "I Am Legend", actor: "Will Smith", genres: ["Action", "Drama", "Sci-Fi"], formats: ["DVD", "Apple Stream"], year: 2007, accent: "from-amber-900 to-slate-950" },
+            { id: 46, title: "In Her Shoes", actor: "Cameron Diaz", genres: ["Comedy", "Drama", "Romance"], formats: ["DVD"], year: 2005, accent: "from-rose-700 to-purple-950" },
+            { id: 47, title: "In Time", actor: "Justin Timberlake", genres: ["Action", "Sci-Fi", "Thriller"], formats: ["DVD"], year: 2011, accent: "from-emerald-800 to-slate-950" },
+            { id: 48, title: "In the Night Garden... Hello Igglepiggle!", actor: "Derek Jacobi", genres: ["Children", "Family"], formats: ["DVD"], year: 2007, accent: "from-teal-700 to-sky-950" },
+            { id: 49, title: "Indiana Jones and the Kingdom of the Crystal Skull", actor: "Harrison Ford", genres: ["Action", "Adventure"], formats: ["DVD"], year: 2008, accent: "from-amber-800 to-stone-950" },
+            { id: 50, title: "Indiana Jones and the Last Crusade", actor: "Harrison Ford", genres: ["Action", "Adventure"], formats: ["DVD"], year: 1989, accent: "from-amber-900 to-orange-950" },
+            { id: 51, title: "Indiana Jones and the Temple of Doom", actor: "Harrison Ford", genres: ["Action", "Adventure"], formats: ["DVD"], year: 1984, accent: "from-red-900 to-amber-950" },
+            { id: 52, title: "Inferno", actor: "Tom Hanks", genres: ["Action", "Adventure", "Crime", "Mystery"], formats: ["DVD"], year: 2016, accent: "from-red-950 to-stone-950" },
+            { id: 53, title: "Interview with the Vampire", actor: "Tom Cruise", genres: ["Drama", "Fantasy", "Horror"], formats: ["DVD"], year: 1994, accent: "from-purple-950 to-slate-950" },
+            { id: 54, title: "Jarhead", actor: "Jake Gyllenhaal", genres: ["Action", "Biography", "Drama", "War"], formats: ["DVD"], year: 2005, accent: "from-amber-900 to-stone-950" },
+            { id: 55, title: "JFK", actor: "Kevin Costner", genres: ["Drama", "History", "Thriller"], formats: ["DVD"], year: 1991, accent: "from-slate-800 to-stone-950" },
+            { id: 56, title: "Jingle All the Way", actor: "Arnold Schwarzenegger", genres: ["Comedy", "Family"], formats: ["DVD"], year: 1996, accent: "from-red-800 to-emerald-950" },
+            { id: 57, title: "K-PAX", actor: "Kevin Spacey", genres: ["Drama", "Sci-Fi"], formats: ["DVD"], year: 2001, accent: "from-indigo-900 to-slate-950" },
+            { id: 58, title: "Little Miss Sunshine", actor: "Steve Carell", genres: ["Comedy", "Drama"], formats: ["DVD"], year: 2006, accent: "from-yellow-600 to-amber-950" },
+            { id: 59, title: "Man on Fire", actor: "Denzel Washington", genres: ["Action", "Crime", "Drama", "Thriller"], formats: ["DVD"], year: 2004, accent: "from-orange-900 to-slate-950" },
+            { id: 60, title: "Meet Joe Black", actor: "Brad Pitt", genres: ["Drama", "Fantasy", "Romance"], formats: ["DVD"], year: 1998, accent: "from-indigo-900 to-slate-950" },
+            { id: 61, title: "Meet the Parents", actor: "Ben Stiller", genres: ["Comedy", "Romance"], formats: ["DVD"], year: 2000, accent: "from-blue-700 to-slate-950" },
+            { id: 62, title: "Men in Black", actor: "Will Smith", genres: ["Action", "Adventure", "Comedy", "Sci-Fi"], formats: ["DVD"], year: 1997, accent: "from-slate-800 to-indigo-950" },
+            { id: 63, title: "Michael Clayton", actor: "George Clooney", genres: ["Crime", "Drama", "Mystery", "Thriller"], formats: ["DVD"], year: 2007, accent: "from-slate-800 to-zinc-950" },
+            { id: 64, title: "Mission: Impossible The 5 Movie Collection", actor: "Tom Cruise", genres: ["Action", "Adventure", "Thriller"], formats: ["DVD"], year: "1996-2015", accent: "from-red-800 to-slate-950" },
+            { id: 65, title: "Moneyball", actor: "Brad Pitt", genres: ["Biography", "Drama", "Sport"], formats: ["DVD"], year: 2011, accent: "from-emerald-800 to-slate-950" },
+            { id: 66, title: "Monty Python's Life of Brian", actor: "Graham Chapman", genres: ["Comedy"], formats: ["DVD"], year: 1979, accent: "from-amber-700 to-rose-950" },
+            { id: 67, title: "Monty Python's The Meaning of Life", actor: "Graham Chapman", genres: ["Comedy", "Musical"], formats: ["DVD"], year: 1983, accent: "from-purple-800 to-slate-950" },
+            { id: 68, title: "Night at the Museum", actor: "Ben Stiller", genres: ["Adventure", "Comedy", "Family"], formats: ["DVD"], year: 2006, accent: "from-amber-700 to-blue-950" },
+            { id: 69, title: "Night at the Museum: Secret of the Tomb", actor: "Ben Stiller", genres: ["Adventure", "Comedy", "Family"], formats: ["DVD"], year: 2014, accent: "from-indigo-800 to-amber-950" },
+            { id: 70, title: "O Brother, Where Art Thou?", actor: "George Clooney", genres: ["Comedy", "Crime", "Music"], formats: ["DVD"], year: 2000, accent: "from-amber-700 to-stone-950" },
+            { id: 71, title: "Ocean's Eleven", actor: "George Clooney", genres: ["Crime", "Thriller"], formats: ["DVD"], year: 2001, accent: "from-slate-800 to-indigo-950" },
+            { id: 72, title: "Ocean's Thirteen", actor: "George Clooney", genres: ["Crime", "Thriller"], formats: ["DVD"], year: 2007, accent: "from-slate-800 to-purple-950" },
+            { id: 73, title: "Once Upon a Time in the West", actor: "Henry Fonda", genres: ["Western"], formats: ["DVD"], year: 1968, accent: "from-amber-900 to-orange-950" },
+            { id: 74, title: "One Flew Over the Cuckoo's Nest", actor: "Jack Nicholson", genres: ["Drama"], formats: ["DVD"], year: 1975, accent: "from-stone-700 to-slate-950" },
+            { id: 75, title: "Outbreak", actor: "Dustin Hoffman", genres: ["Action", "Drama", "Thriller"], formats: ["DVD"], year: 1995, accent: "from-emerald-900 to-slate-950" },
+            { id: 76, title: "Phenomenon", actor: "John Travolta", genres: ["Drama", "Fantasy", "Romance"], formats: ["DVD"], year: 1996, accent: "from-sky-800 to-indigo-950" },
+            { id: 77, title: "Platoon", actor: "Charlie Sheen", genres: ["Drama", "War"], formats: ["DVD"], year: 1986, accent: "from-emerald-900 to-stone-950" },
+            { id: 78, title: "Predator", actor: "Arnold Schwarzenegger", genres: ["Action", "Adventure", "Horror", "Sci-Fi"], formats: ["DVD"], year: 1987, accent: "from-emerald-800 to-red-950" },
+            { id: 79, title: "Ray", actor: "Jamie Foxx", genres: ["Biography", "Drama", "Music"], formats: ["DVD"], year: 2004, accent: "from-purple-900 to-indigo-950" },
+            { id: 80, title: "Rise of the Planet of the Apes", actor: "James Franco", genres: ["Action", "Drama", "Sci-Fi"], formats: ["DVD"], year: 2011, accent: "from-stone-800 to-emerald-950" },
+            { id: 81, title: "Salt", actor: "Angelina Jolie", genres: ["Action", "Mystery", "Thriller"], formats: ["DVD"], year: 2010, accent: "from-slate-800 to-red-950" },
+            { id: 82, title: "Seabiscuit", actor: "Tobey Maguire", genres: ["Biography", "Drama", "History", "Sport"], formats: ["DVD"], year: 2003, accent: "from-amber-800 to-stone-950" },
+            { id: 83, title: "Serendipity", actor: "John Cusack", genres: ["Comedy", "Romance"], formats: ["DVD"], year: 2001, accent: "from-rose-800 to-indigo-950" },
+            { id: 84, title: "Shallow Hal", actor: "Gwyneth Paltrow", genres: ["Comedy", "Fantasy", "Romance"], formats: ["DVD"], year: 2001, accent: "from-pink-700 to-slate-950" },
+            { id: 85, title: "Sherlock Holmes", actor: "Robert Downey Jr.", genres: ["Action", "Adventure", "Mystery"], formats: ["DVD"], year: 2009, accent: "from-amber-900 to-slate-950" },
+            { id: 86, title: "Shrek", actor: "Mike Myers", genres: ["Animation", "Adventure", "Comedy", "Fantasy"], formats: ["DVD"], year: 2001, accent: "from-lime-800 to-emerald-950" },
+            { id: 87, title: "Shrek 2", actor: "Mike Myers", genres: ["Animation", "Adventure", "Comedy", "Fantasy"], formats: ["DVD"], year: 2004, accent: "from-lime-700 to-teal-950" },
+            { id: 88, title: "Signs", actor: "Mel Gibson", genres: ["Drama", "Mystery", "Sci-Fi"], formats: ["DVD"], year: 2002, accent: "from-emerald-950 to-slate-950" },
+            { id: 89, title: "Snatch", actor: "Jason Statham", genres: ["Comedy", "Crime"], formats: ["DVD"], year: 2000, accent: "from-stone-800 to-indigo-950" },
+            { id: 90, title: "Spanglish", actor: "Adam Sandler", genres: ["Comedy", "Drama", "Romance"], formats: ["DVD"], year: 2004, accent: "from-orange-800 to-slate-950" },
+            { id: 91, title: "Spider-Man", actor: "Tobey Maguire", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["DVD"], year: 2002, accent: "from-red-800 to-blue-950" },
+            { id: 92, title: "Spy Game", actor: "Robert Redford", genres: ["Action", "Crime", "Thriller"], formats: ["DVD"], year: 2001, accent: "from-amber-900 to-slate-950" },
+            { id: 93, title: "Star Trek First Contact", actor: "Patrick Stewart", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["DVD"], year: 1996, accent: "from-blue-900 to-slate-950" },
+            { id: 94, title: "Star Trek Generations", actor: "Patrick Stewart", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["DVD"], year: 1994, accent: "from-blue-800 to-indigo-950" },
+            { id: 95, title: "Star Trek Insurrection", actor: "Patrick Stewart", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["DVD"], year: 1998, accent: "from-indigo-800 to-teal-950" },
+            { id: 96, title: "Star Trek Into Darkness", actor: "Chris Pine", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["DVD"], year: 2013, accent: "from-slate-800 to-blue-950" },
+            { id: 97, title: "Star Trek: The Motion Picture", actor: "William Shatner", genres: ["Adventure", "Mystery", "Sci-Fi"], formats: ["DVD"], year: 1979, accent: "from-purple-900 to-slate-950" },
+            { id: 98, title: "Star Wars", actor: "Mark Hamill", genres: ["Action", "Adventure", "Fantasy", "Sci-Fi"], formats: ["DVD"], year: 1977, accent: "from-amber-600 to-blue-950" },
+            { id: 99, title: "Stargate", actor: "Kurt Russell", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["DVD"], year: 1994, accent: "from-cyan-900 to-amber-950" },
+            { id: 100, title: "Stigmata", actor: "Patricia Arquette", genres: ["Horror", "Mystery"], formats: ["DVD"], year: 1999, accent: "from-red-950 to-stone-950" },
+            { id: 101, title: "Superbad", actor: "Jonah Hill", genres: ["Comedy"], formats: ["DVD"], year: 2007, accent: "from-yellow-700 to-red-950" },
+            { id: 102, title: "Taken 2", actor: "Liam Neeson", genres: ["Action", "Crime", "Thriller"], formats: ["DVD"], year: 2012, accent: "from-slate-800 to-stone-950" },
+            { id: 103, title: "The Abyss", actor: "Ed Harris", genres: ["Adventure", "Drama", "Sci-Fi"], formats: ["DVD"], year: 1989, accent: "from-cyan-900 to-slate-950" },
+            { id: 104, title: "The American", actor: "George Clooney", genres: ["Action", "Crime", "Drama"], formats: ["DVD"], year: 2010, accent: "from-stone-800 to-slate-950" },
+            { id: 105, title: "The Aviator", actor: "Leonardo DiCaprio", genres: ["Biography", "Drama"], formats: ["DVD"], year: 2004, accent: "from-amber-800 to-slate-950" },
+            { id: 106, title: "The Body", actor: "Antonio Banderas", genres: ["Drama", "Mystery", "Thriller"], formats: ["DVD"], year: 2001, accent: "from-stone-800 to-amber-950" },
+            { id: 107, title: "The Bourne Ultimate Collection", actor: "Matt Damon", genres: ["Action", "Mystery", "Thriller"], formats: ["DVD"], year: "2002-2012", accent: "from-slate-800 to-blue-950" },
+            { id: 108, title: "The Butterfly Effect", actor: "Ashton Kutcher", genres: ["Drama", "Sci-Fi", "Thriller"], formats: ["DVD"], year: 2004, accent: "from-purple-900 to-slate-950" },
+            { id: 109, title: "The Count of Monte Cristo", actor: "Jim Caviezel", genres: ["Action", "Adventure", "Drama"], formats: ["DVD"], year: 2002, accent: "from-amber-900 to-stone-950" },
+            { id: 110, title: "The Da Vinci Code", actor: "Tom Hanks", genres: ["Mystery", "Thriller"], formats: ["DVD"], year: 2006, accent: "from-amber-950 to-stone-950" },
+            { id: 111, title: "The Day After Tomorrow", actor: "Dennis Quaid", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["DVD"], year: 2004, accent: "from-sky-900 to-slate-950" },
+            { id: 112, title: "The Devil Wears Prada", actor: "Meryl Streep", genres: ["Comedy", "Drama"], formats: ["DVD"], year: 2006, accent: "from-rose-800 to-purple-950" },
+            { id: 113, title: "The Exorcism of Emily Rose", actor: "Laura Linney", genres: ["Drama", "Horror", "Mystery"], formats: ["DVD"], year: 2005, accent: "from-stone-900 to-red-950" },
+            { id: 114, title: "The Exorcist", actor: "Ellen Burstyn", genres: ["Horror"], formats: ["DVD"], year: 1973, accent: "from-slate-900 to-red-950" },
+            { id: 115, title: "The Girl with the Dragon Tattoo", actor: "Daniel Craig", genres: ["Crime", "Drama", "Mystery"], formats: ["DVD"], year: 2011, accent: "from-zinc-800 to-slate-950" },
+            { id: 116, title: "The Godfather", actor: "Marlon Brando", genres: ["Crime", "Drama"], formats: ["DVD"], year: 1972, accent: "from-stone-900 to-amber-950" },
+            { id: 117, title: "The Goonies", actor: "Sean Astin", genres: ["Adventure", "Comedy", "Family"], formats: ["DVD"], year: 1985, accent: "from-amber-700 to-indigo-950" },
+            { id: 118, title: "The Great Escape", actor: "Steve McQueen", genres: ["Adventure", "Drama", "History", "War"], formats: ["DVD"], year: 1963, accent: "from-amber-800 to-stone-950" },
+            { id: 119, title: "The Green Mile", actor: "Tom Hanks", genres: ["Crime", "Drama", "Fantasy"], formats: ["DVD"], year: 1999, accent: "from-emerald-900 to-slate-950" },
+            { id: 120, title: "The Italian Job", actor: "Mark Wahlberg", genres: ["Action", "Crime", "Thriller"], formats: ["DVD"], year: 2003, accent: "from-blue-800 to-slate-950" },
+            { id: 121, title: "The King's Speech", actor: "Colin Firth", genres: ["Biography", "Drama", "History"], formats: ["DVD"], year: 2010, accent: "from-amber-800 to-slate-950" },
+            { id: 122, title: "The Legend of Bagger Vance", actor: "Will Smith", genres: ["Drama", "Fantasy", "Sport"], formats: ["DVD"], year: 2000, accent: "from-emerald-800 to-amber-950" },
+            { id: 123, title: "The Lord of the Rings: The Two Towers", actor: "Elijah Wood", genres: ["Action", "Adventure", "Drama", "Fantasy"], formats: ["DVD"], year: 2002, accent: "from-amber-800 to-emerald-950" },
+            { id: 124, title: "The Mask of Zorro", actor: "Antonio Banderas", genres: ["Action", "Adventure", "Comedy"], formats: ["DVD"], year: 1998, accent: "from-red-900 to-amber-950" },
+            { id: 125, title: "The Mummy", actor: "Brendan Fraser", genres: ["Action", "Adventure", "Fantasy"], formats: ["DVD"], year: 1999, accent: "from-amber-800 to-stone-950" },
+            { id: 126, title: "The Mummy Returns", actor: "Brendan Fraser", genres: ["Action", "Adventure", "Fantasy"], formats: ["DVD"], year: 2001, accent: "from-amber-900 to-orange-950" },
+            { id: 127, title: "The Mummy: Tomb of the Dragon Emperor", actor: "Brendan Fraser", genres: ["Action", "Adventure", "Fantasy"], formats: ["DVD"], year: 2008, accent: "from-red-900 to-stone-950" },
+            { id: 128, title: "The Naked Gun", actor: "Leslie Nielsen", genres: ["Comedy", "Crime"], formats: ["DVD"], year: 1988, accent: "from-blue-700 to-red-950" },
+            { id: 129, title: "The Nutty Professor", actor: "Eddie Murphy", genres: ["Comedy", "Romance", "Sci-Fi"], formats: ["DVD"], year: 1996, accent: "from-indigo-700 to-pink-950" },
+            { id: 130, title: "The Polar Express", actor: "Tom Hanks", genres: ["Animation", "Adventure", "Comedy", "Family"], formats: ["DVD"], year: 2004, accent: "from-blue-800 to-cyan-950" },
+            { id: 131, title: "The Sandlot Kids", actor: "Tom Guiry", genres: ["Comedy", "Family", "Sport"], formats: ["DVD"], year: 1993, accent: "from-amber-700 to-emerald-950" },
+            { id: 132, title: "The Sandlot Kids 2", actor: "Max Lloyd-Jones", genres: ["Comedy", "Family", "Sport"], formats: ["DVD"], year: 2005, accent: "from-emerald-700 to-amber-950" },
+            { id: 133, title: "The Seven Year Itch", actor: "Marilyn Monroe", genres: ["Comedy", "Romance"], formats: ["DVD"], year: 1955, accent: "from-pink-800 to-rose-950" },
+            { id: 134, title: "The Sixth Sense", actor: "Bruce Willis", genres: ["Drama", "Mystery", "Sci-Fi", "Thriller"], formats: ["DVD", "Apple Stream"], year: 1999, accent: "from-slate-800 to-purple-950" },
+            { id: 135, title: "The Sum of All Fears", actor: "Ben Affleck", genres: ["Action", "Drama", "Thriller"], formats: ["DVD"], year: 2002, accent: "from-slate-800 to-red-950" },
+            { id: 136, title: "The Tailor of Panama", actor: "Pierce Brosnan", genres: ["Drama", "Thriller"], formats: ["DVD"], year: 2001, accent: "from-teal-800 to-slate-950" },
+            { id: 137, title: "The Thomas Crown Affair", actor: "Pierce Brosnan", genres: ["Crime", "Romance", "Thriller"], formats: ["DVD"], year: 1999, accent: "from-blue-900 to-slate-950" },
+            { id: 138, title: "The Tourist", actor: "Johnny Depp", genres: ["Action", "Romance", "Thriller"], formats: ["DVD"], year: 2010, accent: "from-indigo-900 to-slate-950" },
+            { id: 139, title: "Three Kings", actor: "George Clooney", genres: ["Action", "Adventure", "Comedy", "War"], formats: ["DVD"], year: 1999, accent: "from-amber-800 to-stone-950" },
+            { id: 140, title: "Total Recall", actor: "Arnold Schwarzenegger", genres: ["Action", "Sci-Fi"], formats: ["DVD"], year: 1990, accent: "from-red-900 to-amber-950" },
+            { id: 141, title: "Transformers", actor: "Shia LaBeouf", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["DVD"], year: 2007, accent: "from-blue-900 to-slate-950" },
+            { id: 142, title: "Transformers: Revenge of the Fallen", actor: "Shia LaBeouf", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["DVD"], year: 2009, accent: "from-orange-900 to-slate-950" },
+            { id: 143, title: "Tropic Thunder", actor: "Ben Stiller", genres: ["Action", "Comedy"], formats: ["DVD"], year: 2008, accent: "from-emerald-800 to-amber-950" },
+            { id: 144, title: "Twelve Monkeys", actor: "Bruce Willis", genres: ["Mystery", "Sci-Fi", "Thriller"], formats: ["DVD"], year: 1995, accent: "from-slate-800 to-stone-950" },
+            { id: 145, title: "Twister", actor: "Helen Hunt", genres: ["Action", "Adventure", "Drama", "Thriller"], formats: ["DVD"], year: 1996, accent: "from-slate-700 to-emerald-950" },
+            { id: 146, title: "Unbreakable", actor: "Bruce Willis", genres: ["Drama", "Mystery", "Sci-Fi", "Thriller"], formats: ["DVD"], year: 2000, accent: "from-emerald-900 to-slate-950" },
+            { id: 147, title: "Valkyrie", actor: "Tom Cruise", genres: ["Drama", "History", "Thriller", "War"], formats: ["DVD"], year: 2008, accent: "from-slate-800 to-red-950" },
+            { id: 148, title: "Vanilla Sky", actor: "Tom Cruise", genres: ["Fantasy", "Mystery", "Romance", "Sci-Fi"], formats: ["DVD"], year: 2001, accent: "from-sky-800 to-indigo-950" },
+            { id: 149, title: "Volcano", actor: "Tommy Lee Jones", genres: ["Action", "Drama", "Sci-Fi", "Thriller"], formats: ["DVD"], year: 1997, accent: "from-red-900 to-stone-950" },
+            { id: 150, title: "Walk the Line", actor: "Joaquin Phoenix", genres: ["Biography", "Drama", "Music", "Romance"], formats: ["DVD"], year: 2005, accent: "from-amber-900 to-red-950" },
+            { id: 151, title: "We Bought a Zoo", actor: "Matt Damon", genres: ["Comedy", "Drama", "Family"], formats: ["DVD"], year: 2011, accent: "from-emerald-700 to-amber-950" },
+            { id: 152, title: "Wonder Woman", actor: "Gal Gadot", genres: ["Action", "Adventure", "Fantasy"], formats: ["DVD"], year: 2017, accent: "from-amber-700 to-red-950" },
+            { id: 153, title: "X-Men 2", actor: "Patrick Stewart", genres: ["Action", "Sci-Fi"], formats: ["DVD"], year: 2003, accent: "from-blue-900 to-slate-950" },
 
             // --- Blu-Rays ---
-            { id: 154, title: "2012", actor: "John Cusack", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2009, accent: "from-blue-900 to-slate-950" },
-            { id: 155, title: "8 Mile", actor: "Eminem", genres: ["Drama", "Music"], format: "Blu-Ray", year: 2002, accent: "from-slate-800 to-zinc-950" },
-            { id: 156, title: "A Few Dollars More", actor: "Clint Eastwood", genres: ["Western"], format: "Blu-Ray", year: 1965, accent: "from-amber-900 to-stone-950" },
-            { id: 157, title: "Aftersun", actor: "Paul Mescal", genres: ["Drama"], format: "Blu-Ray", year: 2022, accent: "from-sky-800 to-amber-950" },
-            { id: 158, title: "Apocalypse Now Final Cut", actor: "Martin Sheen", genres: ["Drama", "Mystery", "War"], format: "Blu-Ray", year: 1979, accent: "from-orange-900 to-stone-950" },
-            { id: 159, title: "Avatar", actor: "Sam Worthington", genres: ["Action", "Adventure", "Fantasy", "Sci-Fi"], format: "Blu-Ray", year: 2009, accent: "from-cyan-800 to-blue-950" },
-            { id: 160, title: "Batman", actor: "Michael Keaton", genres: ["Action", "Adventure"], format: "Blu-Ray", year: 1989, accent: "from-slate-900 to-purple-950" },
-            { id: 161, title: "Batman Begins", actor: "Christian Bale", genres: ["Action", "Crime", "Drama"], format: "Blu-Ray", year: 2005, accent: "from-stone-900 to-amber-950" },
-            { id: 162, title: "Ben-Hur", actor: "Charlton Heston", genres: ["Adventure", "Drama", "History"], format: "Blu-Ray", year: 1959, accent: "from-amber-800 to-stone-950" },
-            { id: 163, title: "Blade Runner The Final Cut", actor: "Harrison Ford", genres: ["Action", "Drama", "Sci-Fi"], format: "Blu-Ray", year: 1982, accent: "from-indigo-900 to-slate-950" },
-            { id: 164, title: "Blade Runner 2049", actor: "Ryan Gosling", genres: ["Action", "Drama", "Mystery", "Sci-Fi"], format: "Blu-Ray", year: 2017, accent: "from-orange-800 to-cyan-950" },
-            { id: 165, title: "Boogie Nights", actor: "Mark Wahlberg", genres: ["Drama"], format: "Blu-Ray", year: 1997, accent: "from-purple-800 to-amber-950" },
-            { id: 166, title: "Casino Royale", actor: "Daniel Craig", genres: ["Action", "Adventure", "Thriller"], format: "Blu-Ray", year: 2006, accent: "from-slate-800 to-cyan-950" },
-            { id: 167, title: "Chitty Chitty Bang Bang", actor: "Dick Van Dyke", genres: ["Adventure", "Family", "Fantasy", "Musical"], format: "Blu-Ray", year: 1968, accent: "from-sky-700 to-pink-950" },
-            { id: 168, title: "Dazed and Confused", actor: "Jason London", genres: ["Comedy"], format: "Blu-Ray", year: 1993, accent: "from-amber-700 to-emerald-950" },
-            { id: 169, title: "Deadpool 2", actor: "Ryan Reynolds", genres: ["Action", "Adventure", "Comedy", "Sci-Fi"], format: "Blu-Ray", year: 2018, accent: "from-red-800 to-slate-950" },
-            { id: 170, title: "Death Proof", actor: "Kurt Russell", genres: ["Action", "Thriller"], format: "Blu-Ray", year: 2007, accent: "from-stone-900 to-red-950" },
-            { id: 171, title: "Django Unchained", actor: "Jamie Foxx", genres: ["Drama", "Western"], format: "Blu-Ray", year: 2012, accent: "from-red-900 to-amber-950" },
-            { id: 172, title: "Dr. Strangelove", actor: "Peter Sellers", genres: ["Comedy", "War"], format: "Blu-Ray", year: 1964, accent: "from-stone-800 to-slate-950" },
-            { id: 173, title: "Dune", actor: "Timothée Chalamet", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2021, accent: "from-amber-900 to-slate-950" },
-            { id: 174, title: "Dune: Part Two", actor: "Timothée Chalamet", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2024, accent: "from-orange-900 to-amber-950" },
-            { id: 175, title: "Ferris Bueller's Day Off", actor: "Matthew Broderick", genres: ["Comedy"], format: "Blu-Ray", year: 1986, accent: "from-sky-700 to-red-950" },
-            { id: 176, title: "Fight Club", actor: "Brad Pitt", genres: ["Drama"], format: "Blu-Ray", year: 1999, accent: "from-rose-900 to-slate-950" },
-            { id: 177, title: "Forrest Gump", actor: "Tom Hanks", genres: ["Drama", "Romance"], format: "Blu-Ray", year: 1994, accent: "from-blue-800 to-amber-950" },
-            { id: 178, title: "Full Metal Jacket", actor: "Matthew Modine", genres: ["Drama", "War"], format: "Blu-Ray", year: 1987, accent: "from-emerald-900 to-stone-950" },
-            { id: 179, title: "Fury", actor: "Brad Pitt", genres: ["Action", "Drama", "War"], format: "Blu-Ray", year: 2014, accent: "from-stone-800 to-amber-950" },
-            { id: 180, title: "Gladiator", actor: "Russell Crowe", genres: ["Action", "Adventure", "Drama"], format: "Blu-Ray", year: 2000, accent: "from-amber-900 to-stone-950" },
-            { id: 181, title: "Guardians of the Galaxy", actor: "Chris Pratt", genres: ["Action", "Adventure", "Comedy", "Sci-Fi"], format: "Blu-Ray", year: 2014, accent: "from-purple-900 to-cyan-950" },
-            { id: 182, title: "Hacksaw Ridge", actor: "Andrew Garfield", genres: ["Biography", "Drama", "History", "War"], format: "Blu-Ray", year: 2016, accent: "from-red-950 to-stone-950" },
-            { id: 183, title: "High and Low", actor: "Toshiro Mifune", genres: ["Crime", "Drama", "Mystery", "Thriller"], format: "Blu-Ray", year: 1963, accent: "from-zinc-800 to-slate-950" },
-            { id: 184, title: "Ikiru", actor: "Takashi Shimura", genres: ["Drama"], format: "Blu-Ray", year: 1952, accent: "from-slate-800 to-stone-950" },
-            { id: 185, title: "Inception", actor: "Leonardo DiCaprio", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2010, accent: "from-slate-800 to-indigo-950" },
-            { id: 186, title: "Inglourious Basterds", actor: "Brad Pitt", genres: ["Adventure", "Drama", "War"], format: "Blu-Ray", year: 2009, accent: "from-red-900 to-stone-950" },
-            { id: 187, title: "Interstellar", actor: "Matthew McConaughey", genres: ["Adventure", "Drama", "Sci-Fi"], format: "Blu-Ray", year: 2014, accent: "from-indigo-900 to-slate-950" },
-            { id: 188, title: "Iron Man", actor: "Robert Downey Jr.", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2008, accent: "from-red-800 to-amber-950" },
-            { id: 189, title: "Jackie Brown", actor: "Pam Grier", genres: ["Crime", "Drama", "Thriller"], format: "Blu-Ray", year: 1997, accent: "from-amber-800 to-red-950" },
-            { id: 190, title: "Jaws", actor: "Roy Scheider", genres: ["Adventure", "Thriller"], format: "Blu-Ray", year: 1975, accent: "from-blue-900 to-cyan-950" },
-            { id: 191, title: "Jurassic Park", actor: "Sam Neill", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 1993, accent: "from-emerald-900 to-amber-950" },
-            { id: 192, title: "Jurassic Park III", actor: "Sam Neill", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2001, accent: "from-emerald-800 to-slate-950" },
-            { id: 193, title: "Kill Bill Volume 1", actor: "Uma Thurman", genres: ["Action", "Crime", "Thriller"], format: "Blu-Ray", year: 2003, accent: "from-yellow-600 to-red-950" },
-            { id: 194, title: "Kill Bill Volume 2", actor: "Uma Thurman", genres: ["Action", "Crime", "Thriller"], format: "Blu-Ray", year: 2004, accent: "from-amber-700 to-red-950" },
-            { id: 195, title: "La Haine", actor: "Vincent Cassel", genres: ["Crime", "Drama"], format: "Blu-Ray", year: 1995, accent: "from-zinc-800 to-stone-950" },
-            { id: 196, title: "La La Land", actor: "Ryan Gosling", genres: ["Comedy", "Drama", "Music", "Romance"], format: "Blu-Ray", year: 2016, accent: "from-purple-800 to-indigo-950" },
-            { id: 197, title: "Lost in Translation", actor: "Bill Murray", genres: ["Comedy", "Drama"], format: "Blu-Ray", year: 2003, accent: "from-indigo-800 to-rose-950" },
-            { id: 198, title: "Mulholland Dr.", actor: "Naomi Watts", genres: ["Drama", "Mystery", "Thriller"], format: "Blu-Ray", year: 2001, accent: "from-purple-950 to-slate-950" },
-            { id: 199, title: "No Country for Old Men", actor: "Tommy Lee Jones", genres: ["Crime", "Drama", "Thriller"], format: "Blu-Ray", year: 2007, accent: "from-stone-900 to-amber-950" },
-            { id: 200, title: "Oliver!", actor: "Mark Lester", genres: ["Drama", "Family", "Musical"], format: "Blu-Ray", year: 1968, accent: "from-amber-800 to-slate-950" },
-            { id: 201, title: "Once Upon a Time in... Hollywood", actor: "Leonardo DiCaprio", genres: ["Comedy", "Drama"], format: "Blu-Ray", year: 2019, accent: "from-yellow-700 to-orange-950" },
-            { id: 202, title: "Oppenheimer", actor: "Cillian Murphy", genres: ["Biography", "Drama", "History"], format: "Blu-Ray", year: 2023, accent: "from-orange-900 to-stone-950" },
-            { id: 203, title: "Pulp Fiction", actor: "John Travolta", genres: ["Crime", "Drama"], format: "Blu-Ray", year: 1994, accent: "from-yellow-700 to-red-950" },
-            { id: 204, title: "Raiders of the Lost Ark", actor: "Harrison Ford", genres: ["Action", "Adventure"], format: "Blu-Ray", year: 1981, accent: "from-amber-800 to-orange-950" },
-            { id: 205, title: "Ran", actor: "Tatsuya Nakadai", genres: ["Action", "Drama", "War"], format: "Blu-Ray", year: 1985, accent: "from-red-950 to-stone-950" },
-            { id: 206, title: "Red Lights", actor: "Cillian Murphy", genres: ["Drama", "Fantasy", "Mystery", "Thriller"], format: "Blu-Ray", year: 2012, accent: "from-red-950 to-slate-950" },
-            { id: 207, title: "Rise of the Planet of the Apes", actor: "James Franco", genres: ["Action", "Drama", "Sci-Fi"], format: "Blu-Ray", year: 2011, accent: "from-stone-800 to-emerald-950" },
-            { id: 208, title: "Se7en", actor: "Morgan Freeman", genres: ["Crime", "Drama", "Mystery", "Thriller"], format: "Blu-Ray", year: 1995, accent: "from-slate-900 to-zinc-950" },
-            { id: 209, title: "Skyfall", actor: "Daniel Craig", genres: ["Action", "Adventure", "Thriller"], format: "Blu-Ray", year: 2012, accent: "from-slate-800 to-cyan-950" },
-            { id: 210, title: "Slumdog Millionaire", actor: "Dev Patel", genres: ["Drama", "Romance"], format: "Blu-Ray", year: 2008, accent: "from-amber-700 to-purple-950" },
-            { id: 211, title: "Some Like It Hot", actor: "Marilyn Monroe", genres: ["Comedy", "Music", "Romance"], format: "Blu-Ray", year: 1959, accent: "from-pink-800 to-slate-950" },
-            { id: 212, title: "Spider-Man: No Way Home", actor: "Tom Holland", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2021, accent: "from-red-800 to-blue-950" },
-            { id: 213, title: "Stanley Kubrick Visionary Filmmaker Collection", actor: "Various / Anthology", genres: ["Drama", "Sci-Fi", "War"], format: "Blu-Ray", year: "1960-1999", accent: "from-purple-900 to-stone-950" },
-            { id: 214, title: "Taken", actor: "Liam Neeson", genres: ["Action", "Crime", "Thriller"], format: "Blu-Ray", year: 2008, accent: "from-slate-800 to-stone-950" },
-            { id: 215, title: "Taxi Driver", actor: "Robert De Niro", genres: ["Crime", "Drama"], format: "Blu-Ray", year: 1976, accent: "from-yellow-800 to-stone-950" },
-            { id: 216, title: "The Adjustment Bureau", actor: "Matt Damon", genres: ["Action", "Romance", "Sci-Fi", "Thriller"], format: "Blu-Ray", year: 2011, accent: "from-slate-800 to-indigo-950" },
-            { id: 217, title: "The Avengers: Endgame", actor: "Robert Downey Jr.", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 2019, accent: "from-purple-900 to-blue-950" },
-            { id: 218, title: "The Dark Knight", actor: "Christian Bale", genres: ["Action", "Crime", "Drama"], format: "Blu-Ray", year: 2008, accent: "from-slate-900 to-blue-950" },
-            { id: 219, title: "The Deer Hunter", actor: "Robert De Niro", genres: ["Drama", "War"], format: "Blu-Ray", year: 1978, accent: "from-stone-800 to-slate-950" },
-            { id: 220, title: "The Good, the Bad and the Ugly", actor: "Clint Eastwood", genres: ["Western"], format: "Blu-Ray", year: 1966, accent: "from-amber-900 to-orange-950" },
-            { id: 221, title: "The Guard", actor: "Brendan Gleeson", genres: ["Comedy", "Crime"], format: "Blu-Ray", year: 2011, accent: "from-emerald-800 to-stone-950" },
-            { id: 222, title: "The Hateful Eight", actor: "Samuel L. Jackson", genres: ["Crime", "Drama", "Mystery", "Western"], format: "Blu-Ray", year: 2015, accent: "from-red-950 to-stone-950" },
-            { id: 223, title: "The Lost World: Jurassic Park", actor: "Jeff Goldblum", genres: ["Action", "Adventure", "Sci-Fi"], format: "Blu-Ray", year: 1997, accent: "from-emerald-950 to-stone-950" },
-            { id: 224, title: "The Martian", actor: "Matt Damon", genres: ["Adventure", "Drama", "Sci-Fi"], format: "Blu-Ray", year: 2015, accent: "from-orange-900 to-slate-950" },
-            { id: 225, title: "The Recruit", actor: "Al Pacino", genres: ["Action", "Crime", "Drama", "Thriller"], format: "Blu-Ray", year: 2003, accent: "from-slate-800 to-indigo-950" },
-            { id: 226, title: "The Thing 2 Movie Boxset", actor: "Kurt Russell", genres: ["Horror", "Mystery", "Sci-Fi"], format: "Blu-Ray", year: "1982-2011", accent: "from-sky-900 to-slate-950" },
-            { id: 227, title: "The Wolf of Wall Street", actor: "Leonardo DiCaprio", genres: ["Biography", "Comedy", "Crime"], format: "Blu-Ray", year: 2013, accent: "from-amber-700 to-emerald-950" },
-            { id: 228, title: "Titanic", actor: "Leonardo DiCaprio", genres: ["Drama", "Romance"], format: "Blu-Ray", year: 1997, accent: "from-blue-900 to-slate-950" },
-            { id: 229, title: "Top Gun 2-Movie Collection", actor: "Tom Cruise", genres: ["Action", "Drama"], format: "Blu-Ray", year: "1986-2022", accent: "from-sky-800 to-blue-950" },
-            { id: 230, title: "Trainspotting", actor: "Ewan McGregor", genres: ["Drama"], format: "Blu-Ray", year: 1996, accent: "from-orange-800 to-slate-950" },
-            { id: 231, title: "Twin Peaks: Fire Walk with Me", actor: "Sheryl Lee", genres: ["Drama", "Horror", "Mystery"], format: "Blu-Ray", year: 1992, accent: "from-red-950 to-purple-950" },
-            { id: 232, title: "Twin Peaks: The Television Collection", actor: "Kyle MacLachlan", genres: ["Drama", "Mystery", "Crime"], format: "Blu-Ray", year: "1990-2017", accent: "from-purple-900 to-slate-950" },
-            { id: 233, title: "Wolf Warriors / A Fistful of Dollars", actor: "Clint Eastwood / Wu Jing", genres: ["Action", "Western"], format: "Blu-Ray", year: "1964-2015", accent: "from-amber-900 to-red-950" },
-            { id: 234, title: "X-Men Origins: Wolverine", actor: "Hugh Jackman", genres: ["Action", "Sci-Fi"], format: "Blu-Ray", year: 2009, accent: "from-amber-800 to-slate-950" }
+            { id: 154, title: "2012", actor: "John Cusack", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Blu-Ray"], year: 2009, accent: "from-blue-900 to-slate-950" },
+            { id: 155, title: "8 Mile", actor: "Eminem", genres: ["Drama", "Music"], formats: ["Blu-Ray"], year: 2002, accent: "from-slate-800 to-zinc-950" },
+            { id: 156, title: "A Few Dollars More", actor: "Clint Eastwood", genres: ["Western"], formats: ["Blu-Ray"], year: 1965, accent: "from-amber-900 to-stone-950" },
+            { id: 157, title: "Aftersun", actor: "Paul Mescal", genres: ["Drama"], formats: ["Blu-Ray"], year: 2022, accent: "from-sky-800 to-amber-950" },
+            { id: 158, title: "Apocalypse Now Final Cut", actor: "Martin Sheen", genres: ["Drama", "Mystery", "War"], formats: ["Blu-Ray"], year: 1979, accent: "from-orange-900 to-stone-950" },
+            { id: 159, title: "Avatar", actor: "Sam Worthington", genres: ["Action", "Adventure", "Fantasy", "Sci-Fi"], formats: ["Blu-Ray"], year: 2009, accent: "from-cyan-800 to-blue-950" },
+            { id: 160, title: "Batman", actor: "Michael Keaton", genres: ["Action", "Adventure"], formats: ["Blu-Ray"], year: 1989, accent: "from-slate-900 to-purple-950" },
+            { id: 161, title: "Batman Begins", actor: "Christian Bale", genres: ["Action", "Crime", "Drama"], formats: ["Blu-Ray"], year: 2005, accent: "from-stone-900 to-amber-950" },
+            { id: 162, title: "Ben-Hur", actor: "Charlton Heston", genres: ["Adventure", "Drama", "History"], formats: ["Blu-Ray"], year: 1959, accent: "from-amber-800 to-stone-950" },
+            { id: 163, title: "Blade Runner The Final Cut", actor: "Harrison Ford", genres: ["Action", "Drama", "Sci-Fi"], formats: ["Blu-Ray"], year: 1982, accent: "from-indigo-900 to-slate-950" },
+            { id: 164, title: "Blade Runner 2049", actor: "Ryan Gosling", genres: ["Action", "Drama", "Mystery", "Sci-Fi"], formats: ["Blu-Ray"], year: 2017, accent: "from-orange-800 to-cyan-950" },
+            { id: 165, title: "Boogie Nights", actor: "Mark Wahlberg", genres: ["Drama"], formats: ["Blu-Ray"], year: 1997, accent: "from-purple-800 to-amber-950" },
+            { id: 166, title: "Casino Royale", actor: "Daniel Craig", genres: ["Action", "Adventure", "Thriller"], formats: ["Blu-Ray"], year: 2006, accent: "from-slate-800 to-cyan-950" },
+            { id: 167, title: "Chitty Chitty Bang Bang", actor: "Dick Van Dyke", genres: ["Adventure", "Family", "Fantasy", "Musical"], formats: ["Blu-Ray"], year: 1968, accent: "from-sky-700 to-pink-950" },
+            { id: 168, title: "Dazed and Confused", actor: "Jason London", genres: ["Comedy"], formats: ["Blu-Ray"], year: 1993, accent: "from-amber-700 to-emerald-950" },
+            { id: 169, title: "Deadpool 2", actor: "Ryan Reynolds", genres: ["Action", "Adventure", "Comedy", "Sci-Fi"], formats: ["Blu-Ray"], year: 2018, accent: "from-red-800 to-slate-950" },
+            { id: 170, title: "Death Proof", actor: "Kurt Russell", genres: ["Action", "Thriller"], formats: ["Blu-Ray"], year: 2007, accent: "from-stone-900 to-red-950" },
+            { id: 171, title: "Django Unchained", actor: "Jamie Foxx", genres: ["Drama", "Western"], formats: ["Blu-Ray"], year: 2012, accent: "from-red-900 to-amber-950" },
+            { id: 172, title: "Dr. Strangelove", actor: "Peter Sellers", genres: ["Comedy", "War"], formats: ["Blu-Ray"], year: 1964, accent: "from-stone-800 to-slate-950" },
+            { id: 173, title: "Dune", actor: "Timothée Chalamet", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Blu-Ray"], year: 2021, accent: "from-amber-900 to-slate-950" },
+            { id: 174, title: "Dune: Part Two", actor: "Timothée Chalamet", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Blu-Ray"], year: 2024, accent: "from-orange-900 to-amber-950" },
+            { id: 175, title: "Ferris Bueller's Day Off", actor: "Matthew Broderick", genres: ["Comedy"], formats: ["Blu-Ray"], year: 1986, accent: "from-sky-700 to-red-950" },
+            { id: 176, title: "Fight Club", actor: "Brad Pitt", genres: ["Drama"], formats: ["Blu-Ray"], year: 1999, accent: "from-rose-900 to-slate-950" },
+            { id: 177, title: "Forrest Gump", actor: "Tom Hanks", genres: ["Drama", "Romance"], formats: ["Blu-Ray"], year: 1994, accent: "from-blue-800 to-amber-950" },
+            { id: 178, title: "Full Metal Jacket", actor: "Matthew Modine", genres: ["Drama", "War"], formats: ["Blu-Ray"], year: 1987, accent: "from-emerald-900 to-stone-950" },
+            { id: 179, title: "Fury", actor: "Brad Pitt", genres: ["Action", "Drama", "War"], formats: ["Blu-Ray"], year: 2014, accent: "from-stone-800 to-amber-950" },
+            { id: 180, title: "Gladiator", actor: "Russell Crowe", genres: ["Action", "Adventure", "Drama"], formats: ["Blu-Ray"], year: 2000, accent: "from-amber-900 to-stone-950" },
+            { id: 181, title: "Guardians of the Galaxy", actor: "Chris Pratt", genres: ["Action", "Adventure", "Comedy", "Sci-Fi"], formats: ["Blu-Ray"], year: 2014, accent: "from-purple-900 to-cyan-950" },
+            { id: 182, title: "Hacksaw Ridge", actor: "Andrew Garfield", genres: ["Biography", "Drama", "History", "War"], formats: ["Blu-Ray"], year: 2016, accent: "from-red-950 to-stone-950" },
+            { id: 183, title: "High and Low", actor: "Toshiro Mifune", genres: ["Crime", "Drama", "Mystery", "Thriller"], formats: ["Blu-Ray"], year: 1963, accent: "from-zinc-800 to-slate-950" },
+            { id: 184, title: "Ikiru", actor: "Takashi Shimura", genres: ["Drama"], formats: ["Blu-Ray"], year: 1952, accent: "from-slate-800 to-stone-950" },
+            { id: 185, title: "Inception", actor: "Leonardo DiCaprio", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Blu-Ray", "Apple Stream"], year: 2010, accent: "from-slate-800 to-indigo-950" },
+            { id: 186, title: "Inglourious Basterds", actor: "Brad Pitt", genres: ["Adventure", "Drama", "War"], formats: ["Blu-Ray"], year: 2009, accent: "from-red-900 to-stone-950" },
+            { id: 187, title: "Interstellar", actor: "Matthew McConaughey", genres: ["Adventure", "Drama", "Sci-Fi"], formats: ["Blu-Ray", "Apple Stream"], year: 2014, accent: "from-indigo-900 to-slate-950" },
+            { id: 188, title: "Iron Man", actor: "Robert Downey Jr.", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Blu-Ray"], year: 2008, accent: "from-red-800 to-amber-950" },
+            { id: 189, title: "Jackie Brown", actor: "Pam Grier", genres: ["Crime", "Drama", "Thriller"], formats: ["Blu-Ray"], year: 1997, accent: "from-amber-800 to-red-950" },
+            { id: 190, title: "Jaws", actor: "Roy Scheider", genres: ["Adventure", "Thriller"], formats: ["Blu-Ray"], year: 1975, accent: "from-blue-900 to-cyan-950" },
+            { id: 191, title: "Jurassic Park", actor: "Sam Neill", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Blu-Ray"], year: 1993, accent: "from-emerald-900 to-amber-950" },
+            { id: 192, title: "Jurassic Park III", actor: "Sam Neill", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Blu-Ray"], year: 2001, accent: "from-emerald-800 to-slate-950" },
+            { id: 193, title: "Kill Bill Volume 1", actor: "Uma Thurman", genres: ["Action", "Crime", "Thriller"], formats: ["Blu-Ray"], year: 2003, accent: "from-yellow-600 to-red-950" },
+            { id: 194, title: "Kill Bill Volume 2", actor: "Uma Thurman", genres: ["Action", "Crime", "Thriller"], formats: ["Blu-Ray"], year: 2004, accent: "from-amber-700 to-red-950" },
+            { id: 195, title: "La Haine", actor: "Vincent Cassel", genres: ["Crime", "Drama"], formats: ["Blu-Ray"], year: 1995, accent: "from-zinc-800 to-stone-950" },
+            { id: 196, title: "La La Land", actor: "Ryan Gosling", genres: ["Comedy", "Drama", "Music", "Romance"], formats: ["Blu-Ray"], year: 2016, accent: "from-purple-800 to-indigo-950" },
+            { id: 197, title: "Lost in Translation", actor: "Bill Murray", genres: ["Comedy", "Drama"], formats: ["Blu-Ray", "Apple Stream"], year: 2003, accent: "from-indigo-800 to-rose-950" },
+            { id: 198, title: "Mulholland Dr.", actor: "Naomi Watts", genres: ["Drama", "Mystery", "Thriller"], formats: ["Blu-Ray"], year: 2001, accent: "from-purple-950 to-slate-950" },
+            { id: 199, title: "No Country for Old Men", actor: "Tommy Lee Jones", genres: ["Crime", "Drama", "Thriller"], formats: ["Blu-Ray"], year: 2007, accent: "from-stone-900 to-amber-950" },
+            { id: 200, title: "Oliver!", actor: "Mark Lester", genres: ["Drama", "Family", "Musical"], formats: ["Blu-Ray"], year: 1968, accent: "from-amber-800 to-slate-950" },
+            { id: 201, title: "Once Upon a Time in... Hollywood", actor: "Leonardo DiCaprio", genres: ["Comedy", "Drama"], formats: ["Blu-Ray"], year: 2019, accent: "from-yellow-700 to-orange-950" },
+            { id: 202, title: "Oppenheimer", actor: "Cillian Murphy", genres: ["Biography", "Drama", "History"], formats: ["Blu-Ray"], year: 2023, accent: "from-orange-900 to-stone-950" },
+            { id: 203, title: "Pulp Fiction", actor: "John Travolta", genres: ["Crime", "Drama"], formats: ["Blu-Ray"], year: 1994, accent: "from-yellow-700 to-red-950" },
+            { id: 204, title: "Raiders of the Lost Ark", actor: "Harrison Ford", genres: ["Action", "Adventure"], formats: ["Blu-Ray"], year: 1981, accent: "from-amber-800 to-orange-950" },
+            { id: 205, title: "Ran", actor: "Tatsuya Nakadai", genres: ["Action", "Drama", "War"], formats: ["Blu-Ray"], year: 1985, accent: "from-red-950 to-stone-950" },
+            { id: 206, title: "Red Lights", actor: "Cillian Murphy", genres: ["Drama", "Fantasy", "Mystery", "Thriller"], formats: ["Blu-Ray"], year: 2012, accent: "from-red-950 to-slate-950" },
+            { id: 207, title: "Rise of the Planet of the Apes", actor: "James Franco", genres: ["Action", "Drama", "Sci-Fi"], formats: ["Blu-Ray"], year: 2011, accent: "from-stone-800 to-emerald-950" },
+            { id: 208, title: "Se7en", actor: "Morgan Freeman", genres: ["Crime", "Drama", "Mystery", "Thriller"], formats: ["Blu-Ray"], year: 1995, accent: "from-slate-900 to-zinc-950" },
+            { id: 209, title: "Skyfall", actor: "Daniel Craig", genres: ["Action", "Adventure", "Thriller"], formats: ["Blu-Ray"], year: 2012, accent: "from-slate-800 to-cyan-950" },
+            { id: 210, title: "Slumdog Millionaire", actor: "Dev Patel", genres: ["Drama", "Romance"], formats: ["Blu-Ray"], year: 2008, accent: "from-amber-700 to-purple-950" },
+            { id: 211, title: "Some Like It Hot", actor: "Marilyn Monroe", genres: ["Comedy", "Music", "Romance"], formats: ["Blu-Ray"], year: 1959, accent: "from-pink-800 to-slate-950" },
+            { id: 212, title: "Spider-Man: No Way Home", actor: "Tom Holland", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Blu-Ray"], year: 2021, accent: "from-red-800 to-blue-950" },
+            { id: 213, title: "Stanley Kubrick Visionary Filmmaker Collection", actor: "Various / Anthology", genres: ["Drama", "Sci-Fi", "War"], formats: ["Blu-Ray"], year: "1960-1999", accent: "from-purple-900 to-stone-950" },
+            { id: 214, title: "Taken", actor: "Liam Neeson", genres: ["Action", "Crime", "Thriller"], formats: ["Blu-Ray", "Apple Stream"], year: 2008, accent: "from-slate-800 to-stone-950" },
+            { id: 215, title: "Taxi Driver", actor: "Robert De Niro", genres: ["Crime", "Drama"], formats: ["Blu-Ray"], year: 1976, accent: "from-yellow-800 to-stone-950" },
+            { id: 216, title: "The Adjustment Bureau", actor: "Matt Damon", genres: ["Action", "Romance", "Sci-Fi", "Thriller"], formats: ["Blu-Ray", "Apple Stream"], year: 2011, accent: "from-slate-800 to-indigo-950" },
+            { id: 217, title: "The Avengers: Endgame", actor: "Robert Downey Jr.", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Blu-Ray"], year: 2019, accent: "from-purple-900 to-blue-950" },
+            { id: 218, title: "The Dark Knight", actor: "Christian Bale", genres: ["Action", "Crime", "Drama"], formats: ["Blu-Ray"], year: 2008, accent: "from-slate-900 to-blue-950" },
+            { id: 219, title: "The Deer Hunter", actor: "Robert De Niro", genres: ["Drama", "War"], formats: ["Blu-Ray"], year: 1978, accent: "from-stone-800 to-slate-950" },
+            { id: 220, title: "The Good, the Bad and the Ugly", actor: "Clint Eastwood", genres: ["Western"], formats: ["Blu-Ray"], year: 1966, accent: "from-amber-900 to-orange-950" },
+            { id: 221, title: "The Guard", actor: "Brendan Gleeson", genres: ["Comedy", "Crime"], formats: ["Blu-Ray"], year: 2011, accent: "from-emerald-800 to-stone-950" },
+            { id: 222, title: "The Hateful Eight", actor: "Samuel L. Jackson", genres: ["Crime", "Drama", "Mystery", "Western"], formats: ["Blu-Ray"], year: 2015, accent: "from-red-950 to-stone-950" },
+            { id: 223, title: "The Lost World: Jurassic Park", actor: "Jeff Goldblum", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Blu-Ray"], year: 1997, accent: "from-emerald-950 to-stone-950" },
+            { id: 224, title: "The Martian", actor: "Matt Damon", genres: ["Adventure", "Drama", "Sci-Fi"], formats: ["Blu-Ray", "Apple Stream"], year: 2015, accent: "from-orange-900 to-slate-950" },
+            { id: 225, title: "The Recruit", actor: "Al Pacino", genres: ["Action", "Crime", "Drama", "Thriller"], formats: ["Blu-Ray"], year: 2003, accent: "from-slate-800 to-indigo-950" },
+            { id: 226, title: "The Thing 2 Movie Boxset", actor: "Kurt Russell", genres: ["Horror", "Mystery", "Sci-Fi"], formats: ["Blu-Ray"], year: "1982-2011", accent: "from-sky-900 to-slate-950" },
+            { id: 227, title: "The Wolf of Wall Street", actor: "Leonardo DiCaprio", genres: ["Biography", "Comedy", "Crime"], formats: ["Blu-Ray"], year: 2013, accent: "from-amber-700 to-emerald-950" },
+            { id: 228, title: "Titanic", actor: "Leonardo DiCaprio", genres: ["Drama", "Romance"], formats: ["Blu-Ray"], year: 1997, accent: "from-blue-900 to-slate-950" },
+            { id: 229, title: "Top Gun 2-Movie Collection", actor: "Tom Cruise", genres: ["Action", "Drama"], formats: ["Blu-Ray"], year: "1986-2022", accent: "from-sky-800 to-blue-950" },
+            { id: 230, title: "Trainspotting", actor: "Ewan McGregor", genres: ["Drama"], formats: ["Blu-Ray"], year: 1996, accent: "from-orange-800 to-slate-950" },
+            { id: 231, title: "Twin Peaks: Fire Walk with Me", actor: "Sheryl Lee", genres: ["Drama", "Horror", "Mystery"], formats: ["Blu-Ray"], year: 1992, accent: "from-red-950 to-purple-950" },
+            { id: 232, title: "Twin Peaks: The Television Collection", actor: "Kyle MacLachlan", genres: ["Drama", "Mystery", "Crime"], formats: ["Blu-Ray"], year: "1990-2017", accent: "from-purple-900 to-slate-950" },
+            { id: 233, title: "Wolf Warriors / A Fistful of Dollars", actor: "Clint Eastwood / Wu Jing", genres: ["Action", "Western"], formats: ["Blu-Ray"], year: "1964-2015", accent: "from-amber-900 to-red-950" },
+            { id: 234, title: "X-Men Origins: Wolverine", actor: "Hugh Jackman", genres: ["Action", "Sci-Fi"], formats: ["Blu-Ray"], year: 2009, accent: "from-amber-800 to-slate-950" },
+            // --- Apple Stream additions ---
+            { id: 235, title: "Anonymous", actor: "Rhys Ifans", genres: ["Drama", "History", "Thriller"], formats: ["Apple Stream"], year: 2011, accent: "from-stone-800 to-slate-950" },
+            { id: 236, title: "Battleship", actor: "Taylor Kitsch", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Apple Stream"], year: 2012, accent: "from-blue-900 to-slate-950" },
+            { id: 237, title: "Big Fish", actor: "Ewan McGregor", genres: ["Adventure", "Drama", "Fantasy"], formats: ["Apple Stream"], year: 2003, accent: "from-emerald-700 to-indigo-950" },
+            { id: 238, title: "Dirty Rotten Scoundrels", actor: "Steve Martin", genres: ["Comedy", "Crime"], formats: ["Apple Stream"], year: 1988, accent: "from-red-900 to-stone-950" },
+            { id: 239, title: "Double Jeopardy", actor: "Ashley Judd", genres: ["Action", "Crime", "Drama", "Thriller"], formats: ["Apple Stream"], year: 1999, accent: "from-indigo-950 to-slate-950" },
+            { id: 240, title: "The Equalizer 2", actor: "Denzel Washington", genres: ["Action", "Crime", "Thriller"], formats: ["Apple Stream"], year: 2018, accent: "from-orange-900 to-slate-950" },
+            { id: 241, title: "Ex Machina", actor: "Alicia Vikander", genres: ["Drama", "Sci-Fi", "Thriller"], formats: ["Apple Stream"], year: 2014, accent: "from-slate-700 to-cyan-950" },
+            { id: 242, title: "Fried Green Tomatoes", actor: "Kathy Bates", genres: ["Comedy", "Drama"], formats: ["Apple Stream"], year: 1991, accent: "from-sky-700 to-amber-950" },
+            { id: 243, title: "Hidden Figures", actor: "Taraji P. Henson", genres: ["Biography", "Drama", "History"], formats: ["Apple Stream"], year: 2016, accent: "from-purple-800 to-slate-950" },
+            { id: 244, title: "The Holdovers", actor: "Paul Giamatti", genres: ["Comedy", "Drama"], formats: ["Apple Stream"], year: 2023, accent: "from-red-900 to-amber-950" },
+            { id: 245, title: "The Hunt for Red October", actor: "Sean Connery", genres: ["Action", "Adventure", "Thriller"], formats: ["Apple Stream"], year: 1990, accent: "from-sky-900 to-slate-950" },
+            { id: 246, title: "The Ides of March", actor: "Ryan Gosling", genres: ["Drama", "Thriller"], formats: ["Apple Stream"], year: 2011, accent: "from-red-800 to-slate-950" },
+            { id: 247, title: "Independence Day", actor: "Will Smith", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Apple Stream"], year: 1996, accent: "from-orange-800 to-slate-950" },
+            { id: 248, title: "Inside Man", actor: "Denzel Washington", genres: ["Crime", "Drama", "Thriller"], formats: ["Apple Stream"], year: 2006, accent: "from-slate-800 to-zinc-950" },
+            { id: 249, title: "Jack Reacher", actor: "Tom Cruise", genres: ["Action", "Crime", "Thriller"], formats: ["Apple Stream"], year: 2012, accent: "from-emerald-900 to-stone-950" },
+            { id: 250, title: "Kingdom of Heaven", actor: "Orlando Bloom", genres: ["Action", "Drama", "History", "War"], formats: ["Apple Stream"], year: 2005, accent: "from-amber-900 to-stone-950" },
+            { id: 251, title: "Kiss Kiss Bang Bang", actor: "Robert Downey Jr.", genres: ["Comedy", "Crime", "Mystery"], formats: ["Apple Stream"], year: 2005, accent: "from-red-700 to-sky-950" },
+            { id: 252, title: "Knight and Day", actor: "Tom Cruise", genres: ["Action", "Comedy", "Romance"], formats: ["Apple Stream"], year: 2010, accent: "from-red-800 to-slate-950" },
+            { id: 253, title: "Edge of Tomorrow", actor: "Tom Cruise", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Apple Stream"], year: 2014, accent: "from-slate-800 to-blue-950" },
+            { id: 254, title: "Master and Commander: The Far Side of the World", actor: "Russell Crowe", genres: ["Action", "Adventure", "Drama"], formats: ["Apple Stream"], year: 2003, accent: "from-sky-900 to-stone-950" },
+            { id: 255, title: "Oblivion", actor: "Tom Cruise", genres: ["Action", "Adventure", "Sci-Fi"], formats: ["Apple Stream"], year: 2013, accent: "from-slate-700 to-sky-950" },
+            { id: 256, title: "One Battle After Another", actor: "Leonardo DiCaprio", genres: ["Action", "Comedy", "Drama"], formats: ["Apple Stream"], year: 2025, accent: "from-orange-900 to-red-950" },
+            { id: 257, title: "Punch-Drunk Love", actor: "Adam Sandler", genres: ["Comedy", "Drama", "Romance"], formats: ["Apple Stream"], year: 2002, accent: "from-sky-800 to-indigo-950" },
+            { id: 258, title: "Stealth", actor: "Josh Lucas", genres: ["Action", "Sci-Fi", "Thriller"], formats: ["Apple Stream"], year: 2005, accent: "from-orange-900 to-slate-950" },
+            { id: 259, title: "Tenet", actor: "John David Washington", genres: ["Action", "Sci-Fi", "Thriller"], formats: ["Apple Stream"], year: 2020, accent: "from-slate-800 to-blue-950" },
+            { id: 260, title: "Unstoppable", actor: "Denzel Washington", genres: ["Action", "Thriller"], formats: ["Apple Stream"], year: 2010, accent: "from-orange-800 to-stone-950" },
+            { id: 261, title: "The Way", actor: "Martin Sheen", genres: ["Adventure", "Drama"], formats: ["Apple Stream"], year: 2010, accent: "from-emerald-800 to-slate-950" },
+            { id: 262, title: "West is West", actor: "Om Puri", genres: ["Comedy", "Drama"], formats: ["Apple Stream"], year: 2010, accent: "from-pink-700 to-emerald-950" },
+            { id: 263, title: "World War Z", actor: "Brad Pitt", genres: ["Action", "Horror", "Sci-Fi", "Thriller"], formats: ["Apple Stream"], year: 2013, accent: "from-slate-800 to-red-950" }
         ];
 
         let currentLetterFilter = null;
         let currentViewMode = 'grid'; // 'grid', 'list', 'grouped'
+
+        // Badge styling per format, shared across grid/list/grouped/modal views
+        const FORMAT_STYLES = {
+            'Blu-Ray': { badge: 'bg-sky-500/20 text-sky-300 border-sky-400/40', badgeStrong: 'bg-sky-500/30 text-sky-200 border-sky-400/50', text: 'text-sky-400' },
+            'DVD': { badge: 'bg-amber-500/20 text-amber-300 border-amber-400/40', badgeStrong: 'bg-amber-500/30 text-amber-200 border-amber-400/50', text: 'text-amber-400' },
+            'Apple Stream': { badge: 'bg-violet-500/20 text-violet-300 border-violet-400/40', badgeStrong: 'bg-violet-500/30 text-violet-200 border-violet-400/50', text: 'text-violet-400' },
+        };
+        function getFormatStyle(format) {
+            return FORMAT_STYLES[format] || FORMAT_STYLES['DVD'];
+        }
+        function formatBadges(formats, variant) {
+            const key = variant === 'strong' ? 'badgeStrong' : 'badge';
+            return formats.map(f => `<span class="text-[10px] font-bold px-2 py-0.5 rounded border backdrop-blur-sm ${getFormatStyle(f)[key]}">${f}</span>`).join(' ');
+        }
 
         // Utility: Strip leading "The " or "A " for proper alphabetical sorting
         function getSortTitle(title) {
@@ -650,14 +700,14 @@
 
             return movies.filter(m => {
                 // Search match across Title, Lead Actor, Genres, and Format
-                const matchSearch = !searchQuery || 
+                const matchSearch = !searchQuery ||
                     m.title.toLowerCase().includes(searchQuery) ||
                     m.actor.toLowerCase().includes(searchQuery) ||
-                    m.format.toLowerCase().includes(searchQuery) ||
+                    m.formats.some(f => f.toLowerCase().includes(searchQuery)) ||
                     m.genres.some(g => g.toLowerCase().includes(searchQuery));
 
                 // Format match
-                const matchFormat = !formatFilter || m.format === formatFilter;
+                const matchFormat = !formatFilter || m.formats.includes(formatFilter);
 
                 // Genre match
                 const matchGenre = !genreFilter || m.genres.includes(genreFilter);
@@ -779,8 +829,6 @@
             let html = `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">`;
             
             items.forEach(m => {
-                const formatClass = m.format === 'Blu-Ray' ? 'bg-sky-500/20 text-sky-300 border-sky-400/40' : 'bg-amber-500/20 text-amber-300 border-amber-400/40';
-                
                 html += `
                     <div onclick="openModal(${m.id})" class="film-card bg-slate-900 border border-slate-800 rounded-xl overflow-hidden cursor-pointer flex flex-col justify-between group shadow-lg hover:border-indigo-500/50 hover:shadow-indigo-500/10">
                         <!-- Top Mini Poster Banner -->
@@ -792,8 +840,8 @@
                                 <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-black/40 backdrop-blur-md text-white/90 border border-white/10">
                                     ${m.year}
                                 </span>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded border backdrop-blur-sm ${formatClass}">
-                                    ${m.format}
+                                <span class="flex flex-wrap gap-1 justify-end">
+                                    ${formatBadges(m.formats)}
                                 </span>
                             </div>
                             <i data-lucide="play-circle" class="w-8 h-8 text-white/70 group-hover:text-white group-hover:scale-110 transition z-10"></i>
@@ -843,14 +891,13 @@
             `;
 
             items.forEach(m => {
-                const formatClass = m.format === 'Blu-Ray' ? 'bg-sky-500/20 text-sky-300 border-sky-400/30' : 'bg-amber-500/20 text-amber-300 border-amber-400/30';
                 html += `
                     <tr class="hover:bg-slate-800/50 transition cursor-pointer group" onclick="openModal(${m.id})">
                         <td class="py-3 px-4 font-semibold text-slate-100 group-hover:text-indigo-400">
                             ${m.title}
                         </td>
                         <td class="py-3 px-4">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${formatClass}">${m.format}</span>
+                            <div class="flex flex-wrap gap-1">${formatBadges(m.formats)}</div>
                         </td>
                         <td class="py-3 px-4 text-slate-300 flex items-center gap-2">
                             <i data-lucide="user" class="w-3.5 h-3.5 text-indigo-400 flex-shrink-0"></i>
@@ -907,14 +954,14 @@
                 `;
 
                 groups[letter].forEach(m => {
-                    const formatClass = m.format === 'Blu-Ray' ? 'text-sky-400' : 'text-amber-400';
+                    const formatTags = m.formats.map(f => `<span class="text-[9px] font-bold ${getFormatStyle(f).text}">[${f}]</span>`).join(' ');
                     html += `
                         <div onclick="openModal(${m.id})" class="p-3 bg-slate-950/60 hover:bg-slate-800/80 border border-slate-800 hover:border-indigo-500/40 rounded-lg cursor-pointer transition flex justify-between items-center group">
                             <div>
                                 <h4 class="font-semibold text-xs text-slate-200 group-hover:text-indigo-300 transition line-clamp-1">${m.title}</h4>
-                                <p class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                                <p class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
                                     <span>${m.actor}</span>
-                                    <span class="text-[9px] font-bold ${formatClass}">[${m.format}]</span>
+                                    ${formatTags}
                                 </p>
                             </div>
                             <span class="text-[10px] text-slate-500 font-mono pl-2">${m.year}</span>
@@ -1013,13 +1060,13 @@
             e.preventDefault();
             const title = document.getElementById('add-title').value.trim();
             const actor = document.getElementById('add-actor').value.trim();
-            const format = document.getElementById('add-format').value;
+            const formats = Array.from(document.querySelectorAll('.add-format-checkbox:checked')).map(cb => cb.value);
             const genre1 = document.getElementById('add-genre1').value.trim();
             const genre2 = document.getElementById('add-genre2').value.trim();
             const year = document.getElementById('add-year').value.trim();
             const accent = document.getElementById('add-accent').value;
 
-            if (!title || !actor || !genre1 || !year) return;
+            if (!title || !actor || !genre1 || !year || formats.length === 0) return;
 
             const genres = [genre1];
             if (genre2) genres.push(genre2);
@@ -1029,7 +1076,7 @@
                 title,
                 actor,
                 genres,
-                format,
+                formats,
                 year,
                 accent
             };
@@ -1044,8 +1091,6 @@
             const movie = movies.find(m => m.id === movieId);
             if (!movie) return;
 
-            const formatClass = movie.format === 'Blu-Ray' ? 'bg-sky-500/30 text-sky-200 border-sky-400/50' : 'bg-amber-500/30 text-amber-200 border-amber-400/50';
-
             const modalContent = document.getElementById('modal-content');
             modalContent.innerHTML = `
                 <div class="space-y-4">
@@ -1054,8 +1099,8 @@
                             <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-black/40 border border-white/20">
                                 Released: ${movie.year}
                             </span>
-                            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded border ${formatClass}">
-                                ${movie.format}
+                            <span class="flex flex-wrap gap-1 justify-end">
+                                ${formatBadges(movie.formats, 'strong')}
                             </span>
                         </div>
                         <h2 class="text-xl font-black mt-2 leading-tight">${movie.title}</h2>
@@ -1073,8 +1118,8 @@
                         <div class="flex items-start gap-2">
                             <i data-lucide="disc" class="w-4 h-4 text-indigo-400 mt-0.5"></i>
                             <div>
-                                <span class="text-slate-400 block font-medium">Physical Media Format:</span>
-                                <span class="font-semibold text-slate-100">${movie.format}</span>
+                                <span class="text-slate-400 block font-medium">Available Format(s):</span>
+                                <div class="flex flex-wrap gap-1 mt-1">${formatBadges(movie.formats)}</div>
                             </div>
                         </div>
 
